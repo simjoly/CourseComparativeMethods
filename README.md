@@ -4,4 +4,4 @@ This repository contains examples of application of phylogenetic comparative met
 Course 1
 --------
 
-[./course1/First_RMarkdown_Document.Rmd](A first RMarkdown example)
+[A first RMarkdown example](./course1/First_RMarkdown_Document.Rmd)
