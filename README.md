@@ -19,3 +19,13 @@ There are several ways you could use the material. You could for example downloa
 [RMardown example](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/course1/First_RMarkdown_Document.html)
 
 [Introduction to phylogenies in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/course1/Introduction_phylo.html)
+
+## Useful ressources
+
+Paradis, E. 2012. Analysis of Phylogenetics and Evolution with R. Springer: New York.
+
+[Liam Revell's phytools blog](http://blog.phytools.org/)
+
+The [r-sig-phylo mailling list](https://stat.ethz.ch/mailman/listinfo/r-sig-phylo)
+
+Bodega's applied phylogenetic workshop website: [Tree thinkes](http://treethinkers.org/)
