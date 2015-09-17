@@ -28,4 +28,4 @@ Paradis, E. 2012. Analysis of Phylogenetics and Evolution with R. Springer: New 
 
 The [r-sig-phylo mailling list](https://stat.ethz.ch/mailman/listinfo/r-sig-phylo)
 
-Bodega's applied phylogenetic workshop website: [Tree thinkes](http://treethinkers.org/)
+Bodega's applied phylogenetic workshop website: [Tree thinkers](http://treethinkers.org/)
