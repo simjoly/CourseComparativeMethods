@@ -20,6 +20,14 @@ There are several ways you could use the material. You could for example downloa
 
 [Introduction to phylogenies in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/course1/Introduction_phylo.html)
 
+## Course 2 - Statistical Methods Accounting for Phylogenies
+
+[Course content](./course2/)
+
+### Tutorials
+
+[Statistical Methods Accounting for Phylogenies](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/course2/StatsPhylo.html)
+
 ## Useful ressources
 
 Paradis, E. 2012. Analysis of Phylogenetics and Evolution with R. Springer: New York. (available in pdf)
