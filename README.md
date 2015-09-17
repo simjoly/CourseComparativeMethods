@@ -22,7 +22,7 @@ There are several ways you could use the material. You could for example downloa
 
 ## Useful ressources
 
-Paradis, E. 2012. Analysis of Phylogenetics and Evolution with R. Springer: New York.
+Paradis, E. 2012. Analysis of Phylogenetics and Evolution with R. Springer: New York. (available in pdf)
 
 [Liam Revell's phytools blog](http://blog.phytools.org/)
 
