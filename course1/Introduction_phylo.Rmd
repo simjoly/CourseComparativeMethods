@@ -3,13 +3,13 @@ title: "Introduction to phylogenies in R"
 author: "Simon Joly"
 date: "BIO 6008 - Fall 2015"
 output:
+  pdf_document:
+    highlight: default
+    toc: yes
+    toc_depth: 2
   html_document:
     highlight: haddock
     theme: united
-    toc: yes
-    toc_depth: 2
-  pdf_document:
-    highlight: default
     toc: yes
     toc_depth: 2
 ---
@@ -125,7 +125,7 @@ legend(0,0,legend=levels(cut(trait1[,1],breaks=8)),
 par(op) #reset graphical parameters to defaults
 ```
 
-As expected from a character simlated with Brownian motion, you can see that closerly related species tend to have more similar character values.
+As expected from a character simlated with Brownian motion, you can see that closely related species tend to have more similar character values.
 
 Another option to represent a continuous parameter is to use the function `table.phylo4d` from the `adephylo` package to represent the trait where its values are represented by sizes of different sizes and colors. It is also possible to plot multiple characters at the same time.
 
@@ -138,6 +138,13 @@ obj <- phylo4d(tree, trait.table) # build a phylo4d object
 op <- par(mar=c(1,1,1,1))
 table.phylo4d(obj,cex.label=1,cex.symbol=1,ratio.tree=0.8,grid=FALSE,box=FALSE)
 par(op) #reset graphical parameters to defaults
+```
+
+You can also represent a traitgram:
+
+```{r "traitgram"}
+require(phytools)
+phenogram(tree,trait3,spread.labels=TRUE)
 ```
 
 Finally, it is also possible to represent a tree on a 2-dimensional plot, coloring points with the categorical variable.
@@ -201,6 +208,8 @@ beasttree <- read.beast("./data/seedplants.tre")
 plot(beasttree)
 node.support(beasttree$posterior,cutoff=0,digits=2)
 ```
+
+> If you want to drop tips from trees in phyloch packages, use the function `drop.tip2` from the `phyloch` package, and not the `drop.tip` from the `ape` package.
 
 The function `read.beast` give a lot of annotations to the tree, which you can see using the command `str(tree)`. For instance, you can access the posterior probability values using `beasttree$posterior`.
 
