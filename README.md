@@ -30,6 +30,10 @@ The Brownian Motion (BM) model, Phylogenetic Independent Contrasts (PIC), Phylog
 
 [Regressions and correlations](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/StatsPhylo.html)
 
+## Lecture 2 - Ancestral states reconstruction
+
+Information to come...
+
 ## Useful ressources
 
 Paradis, E. 2012. Analysis of Phylogenetics and Evolution with R. Springer: New York. (available in pdf)
