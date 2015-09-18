@@ -26,7 +26,7 @@ There are several ways you could use the material. You could for example downloa
 
 ### Tutorials
 
-[Statistical Methods Accounting for Phylogenies](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/StatsPhylo.html)
+[Regressions and correlations](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/StatsPhylo.html)
 
 ## Useful ressources
 
