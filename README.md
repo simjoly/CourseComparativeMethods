@@ -36,7 +36,7 @@ Information to come...
 
 ## Useful ressources
 
-Paradis, E. 2012. Analysis of Phylogenetics and Evolution with R. Springer: New York. (available in pdf)
+Paradis, E. 2012. *Analysis of Phylogenetics and Evolution with R*. Springer: New York. (available in pdf)
 
 [Liam Revell's phytools blog](http://blog.phytools.org/)
 
