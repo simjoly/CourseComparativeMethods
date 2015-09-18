@@ -12,7 +12,7 @@ There are several ways you could use the material. You could for example downloa
 
 ## Lecture 1 - Introduction
 
-[Lecture content](./lecture1/)
+[Lecture material](./lecture1/)
 
 ### Tutorials
 
@@ -22,9 +22,9 @@ There are several ways you could use the material. You could for example downloa
 
 ## Lecture 2 - Regressions and correlations
 
-*The Brownian Motion (BM) model, Phylogenetic Independent Contrasts (PIC), Phylogenetic General Least Squares (PGLS), Phylogenetic Principal Component Analysis (pPCA).*
+The Brownian Motion (BM) model, Phylogenetic Independent Contrasts (PIC), Phylogenetic General Least Squares (PGLS), Phylogenetic Principal Component Analysis (pPCA).
 
-[Lecture content](./lecture2/)
+[Lecture material](./lecture2/)
 
 ### Tutorials
 
