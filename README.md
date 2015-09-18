@@ -4,7 +4,7 @@ This repository contains examples of application of phylogenetic comparative met
 
 ### Acknowledgements
 
-I would like to thank people that share their own tutorials on the web. I have consulted many of them over the years and they have been important my understanding of comparative methods and for the developpement of these tutorials. I thank Liam Revell, Samantha Price, Brian O'Meara, the Nescent wiki, and many others...
+I would like to thank people that share their own tutorials on the web. I have consulted many of them over the years and they have been important my understanding of comparative methods and for the developpement of these tutorials. I thank Liam Revell, Samantha Price, Brian O'Meara, and many others...
 
 ### How to?
 
