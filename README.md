@@ -20,7 +20,7 @@ There are several ways you could use the material. You could for example downloa
 
 [Introduction to phylogenies in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture1/Introduction_phylo.html)
 
-## Lecture 2 - Statistical Methods Accounting for Phylogenies
+## Lecture 2 - Regressions and correlations
 
 [Lecture content](./lecture2/)
 
