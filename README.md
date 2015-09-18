@@ -30,7 +30,7 @@ The Brownian Motion (BM) model, Phylogenetic Independent Contrasts (PIC), Phylog
 
 [Regressions and correlations](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/StatsPhylo.html)
 
-## Lecture 2 - Ancestral states reconstruction
+## Lecture 3 - Ancestral states reconstruction
 
 Information to come...
 
