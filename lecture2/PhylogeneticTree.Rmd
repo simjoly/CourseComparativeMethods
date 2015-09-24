@@ -1,0 +1,116 @@
+---
+title: "Reading and Making Phylogenetic Trees in R"
+author: "Simon Joly"
+date: "24 septembre 2015"
+output: pdf_document
+---
+
+Normally, I would not recommand performing phylogenetic analyses in R. But if you want a simple tree to work with, it is possible to build it in R.
+
+# Importing sequence data
+
+The best is to import sequence data that is aligned and either in fasta or phylip. These are the prefered format in `ape`. To import sequences in fasta format, use the following command.
+
+```{r "Import_fasta", message=FALSE}
+require(ape)
+rbcl <- read.FASTA("./data/rbcL.fasta")
+```
+
+To read sequences in phylip format, use instead this command.
+
+```{r "Import_phylip"}
+require(ape)
+rbcl <- read.dna("./data/rbcL.phy")
+```
+
+## Tree reconstruction
+
+Here, we will use the neighbor-joinning algorithm to reconstruct a phylogeny. This is not the best algorithm, but is it not bad and it is fast. We need a distance matrix to use this method. Here, we get a distance matrix using the K80 nucleotide substitution model. Again, this is just for the demonstration. Normally, you would have to select the best substitution model for your data.
+
+```{r "tree_reconstruction", fig.height=7}
+rbcl.k80 <- dist.dna(rbcl,model="K80")
+rbcl.tree <- nj(rbcl.k80)
+plot(rbcl.tree,cex=0.6, no.margin=TRUE)
+```
+
+## Root tree
+
+You may need to root the tree with the most ancestral sequence. You can do this using the function `root`
+
+```{r "root_tree"}
+rbcl.tree.rooted <- root(rbcl.tree,outgroup="JUVI")
+```
+
+If you do not have an outgroup, you could use midpoint rooting, which places the root in the middle of the longest path between two species.
+
+```{r "midpoint_rooting", fig.height=7, warning=FALSE, message=FALSE}
+require(phangorn)
+rbcl.tree.rooted <- midpoint(rbcl.tree)
+plot(rbcl.tree.rooted,cex=0.6, no.margin=TRUE)
+```
+
+
+## Chronogram
+
+For most phylogenetic comparative methods, it makes sense to use a chronogram, that is a ree with the species that are all equidistant from the root. We also call such trees ultrametric trees. Chronogram can be reconstructed using Bayesian approaches (BEAST, MrBayes), but you can also obtain them using the chronos function in `ape`. Note, however, that the trees obtained with this function might not reflect divergent times, so be careful. But it will be useful for the tutorials of the course.
+
+```{r "chronos", fig.height=7}
+# For unknown reasons, the neighbor-joinning method resulted in 
+# negative branch lengths. Let's give them a length of 0.
+rbcl.tree.rooted$edge.length[rbcl.tree.rooted$edge.length<0] <- 0
+rbcl.chrono <- chronos(rbcl.tree.rooted, model="relaxed")
+#  Check that it is ultrametric
+is.ultrametric(rbcl.chrono)
+plot(rbcl.chrono, cex=0.6, no.margin=TRUE)
+```
+
+By looking at the tree, you can see that the function is problematic. For instance, all the Acer (maple trees; accessions starting with ACxx) are identical for the gene *rbcL*, but after using Chronos they appear to be quite different...
+
+# Import tree
+
+## Tree format
+
+Ideally, you should have built your tree in an appropriate software and load it in R. The pacakge `ape` accepts two trees formats: nexus and newick. 
+
+### The newick format
+
+The newick format is the strict parenthetic format. For example, here is a newick tree with 4 species:
+
+```
+(((species1:4.2,species2:4.2):3.1,species3:7.3):6.3,species4:13.5);
+```
+
+To read a tree in newick format, you need to use to function `read.tree` from `ape`
+
+```{r "read_newick"}
+tree <- read.tree("./data/rbcl.newick")
+```
+
+### The nexus format
+
+The nexus format is slightly more complex and looks like this:
+
+```
+#NEXUS
+begin taxa;
+  dimensions ntax=4;
+	taxlabels
+    species1
+    species2
+    species3
+    species4
+;
+end;
+
+begin trees;
+  tree1 tree_name = [&U] (((species1:4.2,species2:4.2):3.1,species3:7.3):6.3,species4:13.5);
+end;
+```
+
+To read it, you will need the `read.nexus` function.
+
+```{r "read_nexus"}
+tree <- read.nexus("./data/rbcl.tre")
+```
+
+Note that Bayesian trees can be read as well. See the tutorial of the first lecture. 
