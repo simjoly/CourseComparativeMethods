@@ -3,13 +3,13 @@ title: "Phylogenetic Methods"
 author: "Simon Joly"
 date: "BIO 6008 - Fall 2015"
 output:
-  pdf_document:
-    highlight: default
-    toc: yes
-    toc_depth: 2
   html_document:
     highlight: haddock
     theme: united
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    highlight: default
     toc: yes
     toc_depth: 2
 ---
@@ -20,7 +20,7 @@ output:
 
 Phylogenetic comparative methods were introduced by Joseph Felsenstein in 1985. The idea of phylogenetic comparative methods is to correct for the non-independence of species in statistical tests because of their shared evolutionary histories. Indeed, two species may look similar, not because they have been given the same *treatment*, but rather because they are closely related. For instance, considering the following angiosperm phylogeny,
 
-```{r "Angiosperm Tree", echo=FALSE, fig.height=4, fig.width=5}
+```{r "AngiospermTree", echo=FALSE, fig.height=4, fig.width=5, fig.align='center'}
 library(ape)
 data(landplants.newick)
 landplants.tree <- read.tree(text=landplants.newick)
@@ -35,7 +35,7 @@ plot(reduced.landplants.chronos, label.offset=0.02, cex=0.9)
 
 it is clear that *Fagus* (Beech) and *Pisum* (pea) are more likely to share similar characteristics compared to *Asplenium* (a fern), because their share a more recent common ancestor. In other words, their evolutionary histories are shared over a longer period then with *Asplenium*. As such, they have more chance to have more similar traits (and in fact they do). For instance, take two characters, ovule and fertilization type, within this group.
 
-```{r "angiosperms with characters", echo=FALSE, warning=FALSE, fig.height=4, fig.width=5}
+```{r "AngiospermsWithCharacters", echo=FALSE, warning=FALSE, fig.height=4, fig.width=5, fig.align='center'}
 library(RColorBrewer)
 enclosed.ovules <- as.factor(c("no","no","no","no","no","no","yes","yes","yes","yes","yes"))
 double.fertilization <- as.factor(c("no","no","no","no","no","no","yes","yes","yes","yes","yes"))
@@ -65,16 +65,16 @@ Mathematicians have constructed a stochastic process that is intended to approxi
 
 When applied to phylogenies, the Brownian motion model is kind of applied indepenpenty to each branch of the phylogeny. That allows to model the amount of change that occured along a given branch. If the variance of the Brownian motion model is $\sigma^2$ per unit of time $t$, then the net change along a branch of time $t$ is drawn from a normal distribution with mean $0$ and variance $\sigma^2t$. This model can also be represented mathematically the following way, such as the amount of change for character $X$ over the infinitesimal time in the interval between time $t$ and $t+dt$ is:
 
-$$dX(t+1)=\sigma dB(t),$$
+$$dX(t)=\sigma dB(t),$$
 
 where $dB(t)$ is the gaussian distribution. Importantly, this model assumes that:
 
-1. Evolution occuring in each branch of the phylogeny is independent of that occuring in the other branch.
+1. Evolution occuring in each branch of the phylogeny is independent of that occuring in other branches.
 2. Evolution is completely random (i.e., no selection).
 
 The parameter $\sigma^2$ in the model gives the variance, or in other word the speed of evolution. The higher the variance, the faster the character will evolve. Here are two examples of simulated characters on a tree of 200 species with $\sigma^2=0.5$ and $\sigma^2=4$.
 
-```{r "BM model - sigma example", echo=FALSE, fig.height=3, fig.width=5, message=FALSE}
+```{r "BM_Model_SigmaExample", echo=FALSE, fig.height=3, fig.width=5, message=FALSE, fig.align='center'}
 library(phytools)
 library(ggplot2)
 tree<-pbtree(n=200)
@@ -90,7 +90,7 @@ A more thorough introduction to the Brownian Motion model can be found in Felsen
 
 Note also that the model is stochastic. That is, even if two closely related species are more likely to share similar character states than a distant one, this is only true on average. For any given simulated character, closely related species can somtimes be more different than to a distant species. Look at the following example.
 
-```{r "Plot continuous parameter - table.phylo4d", echo=FALSE, message=FALSE}
+```{r "PlotContinuousParameter_tablephylo4d", echo=FALSE, message=FALSE, fig.align='center'}
 library(phytools)
 library(phylobase)
 library(adephylo)
@@ -114,7 +114,7 @@ Phylogenetic independent contrasts (PIC) were introduced by Joseph Felsenstein i
 
 For the PIC examples, we will use data on seed plant functional traits published by [Paquette et al in 2015](http://onlinelibrary.wiley.com/doi/10.1002/ece3.1456/abstract).
 
-```{r "Open seed plant data", warning=FALSE}
+```{r "Open_seed_plant_data", warning=FALSE}
 require(ape)
 seedplantstree <- read.nexus("./data/seedplants.tre")
 seedplantsdata <- read.csv2("./data/seedplants.csv")
@@ -129,7 +129,7 @@ rm(species.to.exclude)
 
 > It is important to assign names to your character vectors. These will be used to match the names of the tips of the phylogeny. If you don't assign names, then the function `pic` will assume that the characters are in the same order as the tip.label of the phylogeny. But this can lead to errors. In general, it is a good idea to have the data to be in the same order as the tip.labels of the phylo anyway.
 
-```{r "Order data", warning=FALSE}
+```{r "Order_data", warning=FALSE}
 # Here is what the loaded data looks like
 head(seedplantsdata)
 # Name the rows of the data.frame with the species codes used as tree labels
@@ -144,7 +144,7 @@ seedplantsdata <- seedplantsdata[seedplantstree$tip.label,]
 
 We will now calculate independent contrasts using the `pic` function in `ape`. First, let's create numeric vectors for four traits: wood density (Wd), shade tolerance (Shade), seed mass (Sm), and nitrogen content (N). A contrast will be calculated for each node. So if there are $n$ species in your tree, $n-1$ contrasts will be estimated. Note that contrasts are estimated for each character individually.
 
-```{r "Calculating Contrasts", warning=FALSE}
+```{r "Calculating_Contrasts", warning=FALSE}
 # Extract trait data into vectors
 Wd <- seedplantsdata$Wd
 Shade <- seedplantsdata$Shade
@@ -168,7 +168,7 @@ contrasts.seedplantsdata <- as.data.frame(apply(seedplantsdata[,-1], 2, pic,
 
 You can display the contrasts at the nodes of the phylogeny.
 
-```{r "Plot contrasts", warning=FALSE, fig.height=9, fig.width=9}
+```{r "Plot_contrasts", warning=FALSE, fig.height=9, fig.width=9}
 plot(seedplantstree, label.offset=0.001,cex=0.6)
 nodelabels(round(Wd.contrast, 2), adj = c(-0.1, -2), frame="n",cex=0.5)
 nodelabels(round(Shade.contrast, 2), adj = c(-0.1, -0.5), frame="n",cex=0.5)
@@ -180,7 +180,7 @@ nodelabels(round(N.contrast, 2), adj = c(-0.1, 2.5), frame="n",cex=0.5)
 
 The correlation between two traits will be tested. Specifically, we will test two hypotheses. The first one is that wood density affects shade tolerance, and the second that leaf nitrogen content affects seed mass.
 
-```{r "Standard regression", warning=FALSE}
+```{r "Standard_regression", warning=FALSE}
 RegressShade <- lm(Shade ~ Wd, seedplantsdata)
 summary.lm(RegressShade)
 RegressSm <- lm(Sm ~ N, seedplantsdata)
@@ -189,7 +189,7 @@ summary.lm(RegressSm)
 
 You can see that there is not significant effect of wood density on shade tolerance, but that the relation between nitrogen content and seed mass is significant. Now let's look at the same relationships after we corrected for phylogenetic information.
 
-```{r "PIC regression", warning=FALSE}
+```{r "PIC_regression", warning=FALSE}
 RegressShade.pic <- lm(Shade.contrast~Wd.contrast -1)
 summary.lm(RegressShade.pic)
 RegressSm.pic <- lm(Sm.contrast~N.contrast -1)
@@ -204,7 +204,7 @@ When taking phylogenetic information into account, seed mass is not significantl
 
 It is often useful to plot the contrasts to visualize the regression. This allows to check that there indeed a linear relationship between the 2 variables:
 
-```{r "Plot PIC regression", fig.height=3, fig.width=3}
+```{r "Plot_PIC_regression", fig.height=3, fig.width=3, fig.align='center'}
 library(ggplot2)
 par(mfrow=c(1,2))
 qplot(Shade,Wd,data=contrasts.seedplantsdata) + geom_smooth(method="lm") + 
@@ -216,7 +216,7 @@ qplot(N,Sm,data=contrasts.seedplantsdata) + geom_smooth(method="lm") + ggtitle("
 
 An alternative to regression when there are no clear dependent variable is major axis regression. Unlike regression where the residuals are only estimated on the y axis, major axis regression is estimated on both x and y axes. This can be done with the package `smatr`. The 'method=2' in the command is for the major axis regression method. 
 
-```{r "Major Axis PIC regression", message=FALSE}
+```{r "Major_Axis_PIC_regression", message=FALSE}
 library(smatr)
 Shade.mar.pic <- slope.test(Shade.contrast,Wd.contrast,test.value=0,
                             intercept=FALSE,method=2)
@@ -272,7 +272,7 @@ names(X)<-names(Y)<-rownames(xx)
 
 Now, let's test whether the different categories differ according to character Y.
 
-```{r "PGLS ANOVA", fig.height=3, fig.width=4}
+```{r "PGLS_ANOVA", fig.height=3, fig.width=4, fig.align='center',warning=FALSE, message=FALSE}
 # PGLS ANOVA
 require(ape)
 require(nlme)
@@ -286,7 +286,8 @@ test.anova <- gls(Y ~ X - 1, data=testdata, correlation = tree.corr)
 # the group means.
 summary(test.anova)
 # The residuals should be normally distributed
-hist(residuals(test.anova))
+qplot(residuals(test.anova),geom="histogram",binwidth=1)
+#hist(residuals(test.anova))
 # It is possible to test if the ANOVA model is better than a null model
 anova(test.anova)
 # It is also possible to compare directly two different models. Here is a simple model
@@ -306,7 +307,7 @@ It is also possible to do phylogenetic logistic regression. That is, you can tes
 
 The package `phylolm` allows you to perform phylogenetic logistic regressions as described in Ives and Garland (2010), using the method of Ho and Ané (2014). To show how it works, let's simulate a tree and three variables, one binary (dependent variable), one quantitative and one categorical.
 
-```{r "logistic regression simulations", message=FALSE}
+```{r "logistic_regression_simulations", message=FALSE}
 require(phylolm)
 set.seed(123456)
 # Simulate a tree of 50 species
@@ -327,7 +328,7 @@ dat = data.frame(binTrait = binTrait, conTrait = conTrait, catTrait = catTrait)
 
 Now you can fit the phylogenetic logistic regression. Let first fit a model with the continuous variable as predictor variable. 
 
-```{r "logistic regression - continuous variable"}
+```{r "logistic_regression_continuous_variable"}
 (fit = phyloglm(binTrait ~ conTrait, phy=tre, data=dat))
 ```
 
@@ -335,7 +336,7 @@ The logistic regression uses alpha to estimate the level of phylogenetic correla
 
 Now let's fit a null model, with only an intercept and no predictor variable.
 
-```{r "logistic regression - categorical variable"}
+```{r "logistic_regression_categorical_variable"}
 (fit0 = phyloglm(binTrait ~ 1, phy=tre, data=dat))
 ```
 
@@ -354,7 +355,7 @@ You can see that the fit of the model is significantly better than the null mode
 
 We can also do the same thing with a categorical variable.
 
-```{r "logistic regression - categorical variable results"}
+```{r "logistic_regression_categorical_variable_results"}
 (fit2 = phyloglm(binTrait ~ catTrait, phy=tre, data=dat))
 data.frame(model=c("catTrait","Null model"),
            log_lik=c(logLik(fit2)$logLik,logLik(fit0)$logLik),
@@ -371,7 +372,7 @@ Principal component analysis (PCA) is a very popular method to represent in a fe
 
 Let's go back to the angiospem data. A PCA of a reduced matrix would look like the following:
 
-```{r "PCA", fig.height=4, fig.width=5}
+```{r "PCA", fig.height=4, fig.width=5, fig.align='center'}
 #Species to keep
 keep<-c("ABBA","ACSA","BEAL","FAGR","FRAM","LALA","PIRU","TIAM","ULAM")
 spnames<-c("Abies","Acer","Betula","Fagus","Fraxinus","Larix","Picea","Tilia","Ulmus")
@@ -394,7 +395,7 @@ legend("bottomleft",pch=20,legend=levels(category),col=colPalette[category],pt.c
 
 Not unexpectedly, you can see that the angiosperms and the gymnosperms occupy different parts of the ordination space. Now, let's compare with a phylogenetic PCA.
 
-```{r "pPCA", fig.height=4, fig.width=5}
+```{r "pPCA", fig.height=4, fig.width=5, fig.align='center'}
 #pPCA
 seedplant.ppca<-phyl.pca(seedplantstreereduced,seedplantsdatareduced,
                          method="BM",mode="corr")
