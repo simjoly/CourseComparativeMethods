@@ -1,11 +1,20 @@
 ---
 title: "Reading and Making Phylogenetic Trees in R"
 author: "Simon Joly"
-date: "24 septembre 2015"
-output: pdf_document
+date: "BIO 6008 - Fall 2015"
+output:
+  pdf_document:
+    highlight: default
+    toc: yes
+    toc_depth: 2
+  html_document:
+    highlight: haddock
+    theme: united
+    toc: yes
+    toc_depth: 2
 ---
 
-Normally, I would not recommand performing phylogenetic analyses in R. But if you want a simple tree to work with, it is possible to build it in R.
+> Normally, I would not recommand performing phylogenetic analyses in R. But if you want a simple tree to work with, it is possible to build it in R.
 
 # Importing sequence data
 
@@ -39,6 +48,7 @@ You may need to root the tree with the most ancestral sequence. You can do this 
 
 ```{r "root_tree"}
 rbcl.tree.rooted <- root(rbcl.tree,outgroup="JUVI")
+plot(rbcl.tree.rooted,cex=0.6, no.margin=TRUE)
 ```
 
 If you do not have an outgroup, you could use midpoint rooting, which places the root in the middle of the longest path between two species.
