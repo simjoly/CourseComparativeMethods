@@ -10,6 +10,8 @@ I would like to thank people that share their own tutorials on the web. I have c
 
 There are several ways you could use the material. You could for example download the whole folder by choosing the *download zip* option. But it is perhaps more interesting to fork the repository (you will need to create an account on github) and then clone your new forked repository on your desktop (you will have to browse the [help pages of githup](http://help.github.com) to get started). This will take longer to set-up, but it will give you the opportunity to automatically recieve updates when the tutorials get modified (which might well happen) and even propose modifications to the tutorials if you find mistakes or to propose new analyses.
 
+===============
+
 ## Lecture 1 - Introduction
 
 [Lecture material](./lecture1/)
