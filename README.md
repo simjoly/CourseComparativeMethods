@@ -40,7 +40,7 @@ Reconstruction of ancestral states on phylogenies for quantitative and qualitati
 
 ### Tutorials
 
-[Regressions and correlations](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture3/AncestralStatesReconstruction.html)
+[Ancestral states reconstruction](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture3/AncestralStatesReconstruction.html)
 
 ## Lecture 4 - BayesTraits
 
