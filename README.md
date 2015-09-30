@@ -22,6 +22,8 @@ There are several ways you could use the material. You could for example downloa
 
 [Introduction to phylogenies in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture1/Introduction_phylo.html)
 
+----
+
 ## Lecture 2 - Regressions and correlations
 
 The Brownian Motion (BM) model, Phylogenetic Independent Contrasts (PIC), Phylogenetic General Least Squares (PGLS), Phylogenetic Principal Component Analysis (pPCA).
@@ -34,6 +36,8 @@ The Brownian Motion (BM) model, Phylogenetic Independent Contrasts (PIC), Phylog
 
 [Reading and making phylogenetic trees in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/PhylogeneticTree.html)
 
+----
+
 ## Lecture 3 - Ancestral states reconstruction
 
 Reconstruction of ancestral states on phylogenies for quantitative and qualitative (discrete) characters, marginal vs joint estimation, model selection, stochastic character mapping.
@@ -44,15 +48,21 @@ Reconstruction of ancestral states on phylogenies for quantitative and qualitati
 
 [Ancestral states reconstruction](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture3/AncestralStatesReconstruction.html)
 
+----
+
 ## Lecture 4 - BayesTraits
 
 Bayesian reconstruction of ancestral states using BayesTraits, Testing the correlated evolution of discrete traits, Markov chain Monte Carlo (MCMC) analyses, MCMC chain convergence.
 
 Material to come...
 
+----
+
 ## Lecture 5 - Other methods of trait evolution
 
 Ornstein-Uhlenbeck (OU) model, Early-Burst model, accounting for phylogenetic uncertainty.
+
+----
 
 ## Useful ressources
 
