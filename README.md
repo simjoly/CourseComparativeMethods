@@ -34,7 +34,19 @@ The Brownian Motion (BM) model, Phylogenetic Independent Contrasts (PIC), Phylog
 
 ## Lecture 3 - Ancestral states reconstruction
 
-Information to come...
+Reconstruction of ancestral states on phylogenies for quantitative and qualitative (discrete) characters, marginal vs joint estimation, model selection, stochastic character mapping.
+
+[Lecture material](./lecture3/)
+
+### Tutorials
+
+[Regressions and correlations](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture3/AncestralStatesReconstruction.html)
+
+## Lecture 4 - BayesTraits
+
+Bayesian reconstruction of ancestral states using BayesTraits, Testing the correlated evolution of discrete traits, Markov chain Monte Carlo (MCMC) analyses, MCMC chain convergence.
+
+Material to come...
 
 ## Useful ressources
 
