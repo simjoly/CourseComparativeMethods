@@ -48,6 +48,10 @@ Bayesian reconstruction of ancestral states using BayesTraits, Testing the corre
 
 Material to come...
 
+## Lecture 5 - Other methods of trait evolution
+
+Ornstein-Uhlenbeck (OU) model, Early-Burst model, accounting for phylogenetic uncertainty.
+
 ## Useful ressources
 
 Paradis, E. 2012. *Analysis of Phylogenetics and Evolution with R*. Springer: New York. (available in pdf)
