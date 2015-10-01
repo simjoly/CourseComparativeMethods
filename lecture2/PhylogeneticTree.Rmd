@@ -3,13 +3,13 @@ title: "Reading and Making Phylogenetic Trees in R"
 author: "Simon Joly"
 date: "BIO 6008 - Fall 2015"
 output:
-  pdf_document:
-    highlight: default
-    toc: yes
-    toc_depth: 2
   html_document:
     highlight: haddock
     theme: united
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    highlight: default
     toc: yes
     toc_depth: 2
 ---
@@ -75,6 +75,13 @@ plot(rbcl.chrono, cex=0.6, no.margin=TRUE)
 ```
 
 By looking at the tree, you can see that the function is problematic. For instance, all the Acer (maple trees; accessions starting with ACxx) are identical for the gene *rbcL*, but after using Chronos they appear to be quite different...
+
+If you want to use your chronogram for other analyses, you might have to convert it into a `phylo` object. The simplest way I found of doing so is the following:
+
+```{r "Convert_chronogram_to_phylo"}
+# Convert chronogram to phylo
+rbcl.chrono <- read.tree(text=write.tree(rbcl.chrono))
+```
 
 # Import tree
 
