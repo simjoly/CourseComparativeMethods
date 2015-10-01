@@ -64,6 +64,18 @@ Ornstein-Uhlenbeck (OU) model, Early-Burst model, accounting for phylogenetic un
 
 ----
 
+## Lecture 6 - Diversification analyses
+
+Lineage through-time plots; diversification rate estimation; Trait dependent speciaton and extinction (BISSE model)
+
+----
+
+## Lecture 7 - Phylogenetic information and diversity
+
+Phylogenetic information ($\lambda$, Blomberg's K, Abouheif); Phylogenetic diversity; phylogenetic beta-diversity
+
+----
+
 ## Useful ressources
 
 Paradis, E. 2012. *Analysis of Phylogenetics and Evolution with R*. Springer: New York. (available in pdf)
