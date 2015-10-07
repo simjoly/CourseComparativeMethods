@@ -1,0 +1,14 @@
+#NEXUS
+[created by the 10kTree Website - http://10kTrees.fas.harvard.edu]
+BEGIN TREES;
+translate
+1 Cercopithecus_mona,
+2 Cercopithecus_nictitans,
+3 Homo_sapiens,
+4 Hylobates_agilis,
+5 Cercocebus_torquatus,
+6 Colobus_angolensis,
+7 Colobus_guereza,
+8 Colobus_polykomos;
+tree consensus_8species = ((((2:7.890218,1:7.890217):6.984961,5:14.875179):6.535196,(6:3.714680,(7:2.306768,8:2.306768):1.407911):17.695695):8.589626,(4:19.605945,3:19.605946):10.394055);
+END;

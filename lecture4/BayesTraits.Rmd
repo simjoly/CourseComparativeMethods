@@ -1,0 +1,409 @@
+---
+title: "Bayesian ancestral state reconstruction"
+author: "Simon Joly"
+date: "BIO 6008 - Fall 2015"
+output:
+  pdf_document:
+    highlight: default
+    toc: yes
+    toc_depth: 2
+  html_document:
+    highlight: haddock
+    theme: united
+    toc: yes
+    toc_depth: 2
+---
+
+
+
+# Bayesian ancestral state reconstuctions
+
+In the previous lecture, we saw how to reconstruct ancestral state reconstruction using maximum likelihood or stochatic mapping, the latter of which uses monte carlo simulations. In this lecture, we will see how to reconstruct ancestral states using a full Bayesian approach (Pagel et al. 2004).
+
+For this, we will use the program BayesTraits, written by Andrew Meade and Mark Pagel. Coveniently, Randi Griffin has written wrapper functions that allow to call BayesTrait from R. The BayesTrait wrapper function can be downloaded from her [website](http://people.nunn-lab.org/randi/). However, I have included modified scripts with this lecture of the BayesTraits Wrapper that include several important improvements. For instance, I modified the scripts to make the wrapper multi-platform (the original was only for OSX) and to use the second version of BayesTraits. The BayesTrait Wrapper can be found in the folder BTW.
+
+### Prepare seed plant data
+
+Throughout this tutorial, we will use the seed plant phylogeny and trait data from Paquette et al. (2015). Let's load it and prepare it.
+
+```{r "Open_seed_plant_data", message=FALSE}
+# Load ape
+require(ape)
+# Import datasets
+seedplantstree <- read.nexus("./data/seedplants.tre")
+seedplantsdata <- read.csv2("./data/seedplants.csv")
+# Remove species for which we don't have complete data
+seedplantsdata <- na.omit(seedplantsdata)
+# Remove species in the tree that are not in the data matrix
+species.to.exclude <- seedplantstree$tip.label[!(seedplantstree$tip.label %in% 
+                                                   seedplantsdata$Code)]
+seedplantstree <- drop.tip(seedplantstree,species.to.exclude)
+rm(species.to.exclude)
+# Name the rows of the data.frame with the species codes used as tree labels
+rownames(seedplantsdata) <- seedplantsdata$Code
+seedplantsdata <- seedplantsdata[,-1]
+# Order the data in the same order as the tip.label of the tree. In the present 
+# example, this was already the case.
+seedplantsdata <- seedplantsdata[seedplantstree$tip.label,]
+# Create a factor for a categorical variable
+height <- factor(seedplantsdata$height)
+names(height) <- rownames(seedplantsdata)
+# Create a vector for a continuous character
+maxH <- seedplantsdata$maxH
+names(maxH) <- rownames(seedplantsdata)
+```
+
+# Multistate reconstruction
+
+We will use the MultistateMCMC R function to estimate ancestral states using a Bayesian approach in BayesTraits (Pagel et al. 2004). The first thing to do is to load all the functions from BayesTrait Wrapper. Copy the BTW folder into your working folder and then enter the following code:
+
+```{r "Read_BTW_functions"}
+for (n in 1:length(list.files('./BTW/R'))) { 
+  source(paste("./BTW/R/", list.files('./BTW/R')[n], sep=""))
+}
+```
+
+You will then have to copy the "BayesTraits" programs into your working directory. You can only copy the program that corresponds to your operating system.
+
+## Running the analysis
+
+BayesTraits has several functions that can be modified. The most important are implemented in the BTW functions, but maybe not all of them. For a complete description of the functions available in these function, you should have a look at the BTW manual in the folder `./BTW/help/BTWman.pdf`.
+
+When running a Bayesian analysis of BayesTraits from R, the following parameters are important for Bayesian MCMC analyses:
+
+| Parameter | Description |
+| --------- | ----------- |
+| it | integer specifying number of MCMC iterations. Default is 10000. |
+| bi | integer specifying number of iterations to discard as burn-in. Default is 1000. | 
+| sa | integer specifying number of iterations to skip between samples. Default is 100. |
+| rd | positive number specifying the rate deviation parameter. Default is 2. |
+
+When running the a Multistate analysis, these options are also important:
+
+| Parameter | Description |
+| --------- | ----------- |
+| res | character or vector indicating restrictions to place on rates. If a vector is given, each element indicates an independent restriction. Individual restrictions are given as character strings with the name of each rate separated by a single space, and the last set of characters in the string corresponds to either a rate or a non-negative number to restrict the other rates to. For example, if res = c(“q01 q10 1.2”, “q12 q21”), then rates q01 and q10 will be restricted to equal 1.2, and rate q12 will be restricted to equal q21. |
+| resall | character indicating a rate or a non-negative number to restrict all rates to. |
+| mrca | character or vector indicating nodes to reconstruct using the most recent common ancestor approach. If a vector is given, each element is a character string naming a pair of species whose most recent common ancestor will be reconstructed. Species names must be separated by a single space, e.g., mrca = c(“Lemur_catta Homo_sapiens”). |
+| fo | character or vector indicating nodes to fix at particular states. If a vector is given, each element is a character string beginning with the state to be fixed, followed by the names of two species whose most recent common ancestor is represented by the node, all separated by a single space. For example, fo = c(“1 Lemur_catta Homo_sapiens”, “2 Pan_troglodytes Homo_sapiens”) fixes the ancestral primate (mrca of Lemur and Homo) at state “1” and the ancestral great ape (mrca of Pan and Homo) at state “2”.|
+| et | character or vector listing taxa to exclude.|
+
+And finally, the MultistateMCMC analysis have these additional parameters:
+
+| Parameter | Description |
+| --------- | ----------- |
+| pr | character or vector describing prior distributions for model parameters. If a vector is given, each element is a character string specifying the distribution for a separate parameter by listing first the name of the parameter, then the name of the distribution (exp, gamma, uniform, beta), and finally the parameters that define the distribution. For example, pr = c(“q01 exp 10”, “q10 gamma 10 10”) sets an exponential distribution with mean 10 as the prior for rate q01, and a gamma distribution with mean and shape 10 as the prior for rate q10. By default, parameters have a uniform prior from - 100 to 100.|
+| pa | character string specifying the prior distribution for all parameters by listing first the name of the parameter, then the name of the distribution (exp, gamma, uniform, beta), and finally the parameters that define the distribution. For example, pa = “q01 exp 10” sets an exponential distribution with mean 10 as the prior for all rates in the model.|
+| rj | toggles reversible jump model if non-empty. A character string specifying the prior distribution and it’s parameter(s) to use for the reversible jump model. For example, rj = “exp 10” implements a reversible jump model with an exponential prior of mean 10.|
+| rjhp | toggles reversible jump model with a hyper-prior if non-empty. A character string specifying the prior distribution and it’s parameter(s) to use for the reversible jump model, along with a minimum and maximum value for a uniform hyper-prior. For example, rjhp = “exp 10 0 10” implements a reversible jump model with an exponential prior of mean 10 and a hyper-prior from 0 to 10.|
+| hp | character or vector describing prior distributions and hyper-priors for model parameters. If a vector is given, each element is a character string specifying the prior and uniform hyper-prior for a separate parameter by listing the name of the parameter, then the name of the distribution (exp, gamma, uniform, beta), then the parameters that define the distribution, and finally the minimum and maximum of the hyper-prior. For example, hp = “q01 exp 10 0 10” sets an exponential distribution with mean 10 as the prior for rate q01, and a hyper-prior from 0 to 10 to seed the mean of the exponential prior.|
+| hpall | character string specifying the prior distribution and hyper-prior for all parameters by listing first the name of the distribution (exp, gamma, uniform, beta), then the parameters that define the distribution, and finally the minimum and maximum of the uniform hyper-prior. For example, pa = “q01 exp 10 0 10” sets an exponential distribution with mean 10 as the prior with a hyper-prior from 0 to 10 for all rates.|
+
+We will now run three independent MCMC runs of BayesTraits. This is important to make sure that the analyses have converged on the same estimates.We will use the same substitution model as last week, that is with three different rates. We will run an analysis of 100000 generations (`it`), sampling the chain every 100 generations (`sa=100`), discarding the first 1000 as burnin (`bi`). Finally, a gamma prior with mean 2 and shape 20 will be given to all parameters (`pa="gamma 2 20"`). This distribution looks like the following:
+
+```{r "gamma_distribution", fig.height=4,fig.width=4,fig.align='center'}
+x <- seq(0, 100, length=200)
+hx <- dgamma(x,shape=2,scale=20)
+plot(x,hx,type="l",ylab="density",xlab="value",col="blue")
+```
+
+Now, let's run BayesTraits.
+
+```{r "Bayes_Traits_Wrapper"}
+height.dat<-data.frame(code=rownames(seedplantsdata),height=as.numeric(seedplantsdata$height))
+# Model: rate constraints
+constraints <- c("q21 q13", "q23 q32", "q12 q31")
+# Run three independent analyses (MCMC chains)
+multistate.MCMC.res1 <- MultistateMCMC(seedplantstree, height.dat, res=constraints,
+        it = 100000, bi = 1000, sa = 100, rd = 2, pa = "gamma 2 20", silent = TRUE)
+multistate.MCMC.res2 <- MultistateMCMC(seedplantstree, height.dat, res=constraints,
+        it = 100000, bi = 1000, sa = 100, rd = 2, pa = "gamma 2 20", silent = TRUE)
+multistate.MCMC.res3 <- MultistateMCMC(seedplantstree, height.dat, res=constraints,
+        it = 100000, bi = 1000, sa = 100, rd = 2, pa = "gamma 2 20", silent = TRUE)
+```
+
+## Bayesian analysis diagnostics
+
+For diagnostic of Bayesian MCMC analyses, the package `coda` is very useful to look for chain convergence and calculate statistics. To be able to estimate convergence statistics, it is important to run at least 2 independent chains. This should be standard anyway to ensure convergence and thus that the results are reliable. First, let's convert the output of BayesTraits into `coda` format.
+
+```{r "coda_import", warning=FALSE, message=FALSE}
+require(lattice)
+require(coda)
+# Read the BayesTrait results in coda format
+res1 <- mcmc(multistate.MCMC.res1$Results[,c(-1,-4)],
+             start=min(multistate.MCMC.res1$Results$Iteration),
+             end=max(multistate.MCMC.res1$Results$Iteration),thin=100)
+res2 <- mcmc(multistate.MCMC.res2$Results[,c(-1,-4)],
+             start=min(multistate.MCMC.res2$Results$Iteration),
+             end=max(multistate.MCMC.res2$Results$Iteration),thin=100)
+res3 <- mcmc(multistate.MCMC.res3$Results[,c(-1,-4)],
+             start=min(multistate.MCMC.res3$Results$Iteration),
+             end=max(multistate.MCMC.res2$Results$Iteration),thin=100)
+# Combine the three chains
+res <- mcmc.list(res1,res2,res3)
+```
+
+### Trace plots
+
+Now, we can have a look at the results. Let's start by looking at the values of two parameters along the MCMC chain.
+
+```{r "Trace_plots",fig.width=8, fig.height=4, fig.align='center'}
+# Look at the trace plots for some characters
+op <- par(mfrow=c(1,2))
+traceplot(res[,c(1,3)])
+par(op)
+```
+
+The different colors on the plot represent the different chains. You can see that the values go up-and-down a lot, which is a sign that the chain is mixing well. The opposite would give a lot of correlations between successive samples and would give poor estimates of the parameters.
+
+### Autocorrelation plots
+
+You can see how the correlation drops between successive samples by using the function `acfplot`.
+
+```{r "autocorrelation plot", fig.align='center'}
+acfplot(res[,c(1,3)])
+```
+
+You can see that when samples are approximately 5 samples apart, they are not much correlated.
+
+### Convergence diagnostics
+
+Let's now look at some convergence disgnostics. The effective size of the parameter represents the estimated number of independent samples that are used to estimate the parameter's mean. Because parameter values are sampled from a chain, values sampled consecutively along the chain are generally correlated. The effective size is the estimated number of independent samples remainning once that autocorrelation is removed (this is inferred, of course). You generally want to have at least 200 of effective size to believe in your results (the more the better).
+
+```{r "Effective_sizes"}
+# Get effective sizes (should be > 200)
+effectiveSize(res)
+```
+
+The Gelman and Rubin's Potential Scale Reduction Factor (PSRF) is based on a comparison of within-chain vs. between-chain variance. If the chains have converged, then the potential scale reduction factor should be 1. If the values are above 1.05, this means you should run the chains longer. 
+
+```{r "Gelman_Rubin"}
+# Gelman and Rubin's convergence disgnostic
+gelman.diag(res,autoburnin=FALSE,multivariate=FALSE)
+```
+
+### Density plots
+
+Now, let's look at the density plots for the parameters.
+
+```{r "density_plots",fig.width=5,fig.height=6, fig.align='center'}
+# Density Plots
+densityplot(res[,-2])
+# Parameter summary
+summary(res)
+# Highest Posterior Density intervals
+HPDinterval(res)
+```
+
+The density plots show that the runs have converged on very similar posterior distributions, which confirms the convergence diagnostic stats. The summary gives the quantiles and the median value.
+
+Interestingly, whereas the transition rate parameters are in the same order as with likelihood inference, the variation is much smaller... Actually, this is a consequence of the prior used for the rate variation. If we take a flat prior instead between 0 and 1000, here is what we would get:
+
+```{r "Multistate_uniform_prior", fig.height=6,fig.width=8}
+multistate.MCMC.res1 <- MultistateMCMC(seedplantstree, height.dat, res=constraints,
+    it = 100000, bi = 1000, sa = 100, rd = 2, pa = "uniform 0 1000", silent = TRUE)
+multistate.MCMC.res2 <- MultistateMCMC(seedplantstree, height.dat, res=constraints,
+    it = 100000, bi = 1000, sa = 100, rd = 2, pa = "uniform 0 1000", silent = TRUE)
+multistate.MCMC.res3 <- MultistateMCMC(seedplantstree, height.dat, res=constraints,
+    it = 100000, bi = 1000, sa = 100, rd = 2, pa = "uniform 0 1000", silent = TRUE)
+# Read the BayesTrait results in coda format
+res1 <- mcmc(multistate.MCMC.res1$Results[,c(-1,-4)],
+             start=min(multistate.MCMC.res1$Results$Iteration),
+             end=max(multistate.MCMC.res1$Results$Iteration),thin=100)
+res2 <- mcmc(multistate.MCMC.res2$Results[,c(-1,-4)],
+             start=min(multistate.MCMC.res2$Results$Iteration),
+             end=max(multistate.MCMC.res2$Results$Iteration),thin=100)
+res3 <- mcmc(multistate.MCMC.res3$Results[,c(-1,-4)],
+             start=min(multistate.MCMC.res3$Results$Iteration),
+             end=max(multistate.MCMC.res2$Results$Iteration),thin=100)
+# Combine the three chains
+res <- mcmc.list(res1,res2,res3)
+# Get effective sizes (should be > 200)
+effectiveSize(res)
+# Gelman and Rubin's convergence disgnostic
+gelman.diag(res,autoburnin=FALSE,multivariate=FALSE)
+# Density Plots
+densityplot(res[,-2])
+# Parameter summary
+summary(res)
+```
+
+We can conclude two things from this analysis. First, the posterior distribution is strongly affected by the prior used. This is problematic and it suggest that there may not be enough information in the data to properly estimate the transition rate parameters. This is one of the advantage of the Bayesian approach as you can more easily see when it is the case. Second, the chains have not converged as well with the flat prior. This also likely reflect the little information present in the data. Consequently, you should interpret these results with much caution (if at all!).
+
+# Corelated evolution between binary traits in BayesTraits
+
+A common application of phylogenetic methods is to study the correlation of characters (and their evolution). A very popular model for binary traits is that of Pagel (1994). The idea is to test if two traits evolved in a correlated fashion or independently.
+
+The test is run using the Discrete function of BayesTraits. The example below will focus on a Bayesian approach, but this can also be done with ML. The idea is to evaluate two models: one in which the traits evolve independently and another one where the traits evolved in a correlative way.
+
+## Independent model
+
+The simpler model is the independent one. In this model, there are four paramters:
+
+| Parameter  | Trait | Transitions      |
+| ---------- | ----- | ---------------- |
+| $\alpha_1$ | 1     | $0\rightarrow 1$ |
+| $\beta_1$  | 1     | $1\rightarrow 0$ |
+| $\alpha_2$ | 2     | $0\rightarrow 1$ |
+| $\beta_2$  | 2     | $1\rightarrow 0$ |
+
+This can be represented in a double transition matrix:
+
+|     | 0,0       | 0,1        | 1,0        | 1,1        |
+| --- | --------- | ---------- | ---------- | ---------- |
+| 0,0 | -         | $\alpha_2$ | $\alpha_1$ | 0          |
+| 0,1 | $\beta_2$ | -          | 0          | $\alpha_1$ |
+| 1,0 | $\beta_1$ | 0          | -          | $\alpha_2$ |
+| 1,1 | 0         | $\beta_1$  | $\beta_2$  | -          |
+
+Note that the transitions where both characters would have to evolve at the same time are set to zero as this is impossible in an infinitesimal amount of time.
+
+## Dependent model
+
+The dependent model is more complex. It assumes that the rate of change in one character depends on the state of the other character.
+
+| Parameter  | Dependent on | Trait | Transitions      |
+| ---------- | ------------ | ----- | ---------------- |
+| $q_{1,2}$  | Trait 1 = 0  | 2     | $0\rightarrow 1$ |
+| $q_{1,3}$  | Trait 2 = 0  | 1     | $0\rightarrow 1$ |
+| $q_{2,1}$  | Trait 1 = 0  | 2     | $1\rightarrow 0$ |
+| $q_{2,4}$  | Trait 2 = 1  | 1     | $0\rightarrow 1$ |
+| $q_{3,1}$  | Trait 2 = 0  | 1     | $1\rightarrow 0$ |
+| $q_{3,4}$  | Trait 1 = 1  | 2     | $0\rightarrow 1$ |
+| $q_{4,2}$  | Trait 2 = 1  | 1     | $1\rightarrow 0$ |
+| $q_{4,3}$  | Trait 1 = 1  | 2     | $1\rightarrow 0$ |
+
+As you can see, it has 8 parameters instead of 4. This model results in the following double transition matrix:
+
+|     | 0,0       | 0,1       | 1,0       | 1,1       |
+| --- | --------- | --------- | --------- | --------- |
+| 0,0 | -         | $q_{1,2}$ | $q_{1,3}$ | 0         |
+| 0,1 | $q_{2,1}$ | -         | 0         | $q_{2,4}$ |
+| 1,0 | $q_{3,1}$ | 0         | -         | $q_{3,4}$ |
+| 1,1 | 0         | $q_{4,2}$ | $q_{4,3}$ | -         |
+
+Now, BayesTraits can be use to calculate the fit of the two models and then compare them to select the best one.
+
+## Running the analysis
+
+The idea is to run both models separately and compare their fit. In the Bayesian framework, one uses Bayes Factors to compare the models. Let's first fit the model. For this, we will use 500 trees sampled from the posterior distribution of trees. This has the advantage that the analysis will also integrate phylogenetic uncertainty in the model. This is especially important if the support for the groups in the tree are not all very strong. By doing so, the results obtained integrate over all possible tree topology and accounts for phylogenetic uncertainty. 
+
+We'll have to import these trees. Such posterior samples of trees can be obtained using Bayesian phylogenetic methods (BEAST, MrBayes).
+
+```{r "Read_trees"}
+pdtrees <- read.nexus("./data/pd_500.trees")
+species.to.exclude <- pdtrees[[1]]$tip.label[!(pdtrees[[1]]$tip.label %in% 
+                                                   rownames(seedplantsdata))]
+pdtrees<-lapply(pdtrees,drop.tip,tip=species.to.exclude)
+class(pdtrees)<-"multiPhylo"
+attr(pdtrees,"TipLabel") <- pdtrees[[1]]$tip.label
+rm(species.to.exclude)
+# Need two binary variables
+# Start by converting the height variable in a binary variable (0/1)
+height2 <- as.numeric(seedplantsdata$height)
+height2[height2==2] <- 3
+height2[height2==3] <- 0
+thedata<-data.frame(code=rownames(seedplantsdata),
+           height=height2,ShadeTolerance=as.numeric(seedplantsdata$ShadeTol)-1)
+```
+
+Now, we can perform the BayesTraits analyses using this distribution of trees. For this, we will use the DiscreteMCMC function. The settings are as for above, with a flat prior. The independent and dependent models can be set using the parameter `dependent=FALSE` or `dependent=TRUE`.
+
+```{r "BayesTraits_Discrete_fit"}
+# Fit independent model
+ind.res1 <- DiscreteMCMC(pdtrees, thedata, dependent = FALSE, it = 100000, bi = 1000,
+                         sa = 100, rd = 2, pa = "uniform 0 100", silent = TRUE)
+ind.res2 <- DiscreteMCMC(pdtrees, thedata, dependent = FALSE, it = 100000, bi = 1000,
+                         sa = 100, rd = 2, pa = "uniform 0 100", silent = TRUE)
+# Fit dependent model
+dep.res1 <- DiscreteMCMC(pdtrees, thedata, dependent = TRUE, it = 100000, bi = 1000,
+                         sa = 100, rd = 2, pa = "uniform 0 100", silent = TRUE)
+dep.res2 <- DiscreteMCMC(pdtrees, thedata, dependent = TRUE, it = 100000, bi = 1000,
+                         sa = 100, rd = 2, pa = "uniform 0 100", silent = TRUE)
+```
+
+Now, let's read the results with the `coda` package.
+
+```{r "Analyse_Bayes_traits_corr"}
+require(coda)
+require(lattice)
+# Read the BayesTrait results of the independent model in coda format
+ind1 <- mcmc(ind.res1$Results[,c(-1,-4)],start=min(ind.res1$Results$Iteration),
+             end=max(ind.res1$Results$Iteration),thin=100)
+ind2 <- mcmc(ind.res2$Results[,c(-1,-4)],start=min(ind.res2$Results$Iteration),
+             end=max(ind.res2$Results$Iteration),thin=100)
+# Combine the three chains
+ind <- mcmc.list(ind1,ind2)
+
+# Read the BayesTrait results of the independent model in coda format
+dep1 <- mcmc(dep.res1$Results[,c(-1,-4)],start=min(dep.res1$Results$Iteration),
+             end=max(dep.res1$Results$Iteration),thin=100)
+dep2 <- mcmc(dep.res2$Results[,c(-1,-4)],start=min(dep.res2$Results$Iteration),
+             end=max(dep.res2$Results$Iteration),thin=100)
+# Combine the three chains
+dep <- mcmc.list(dep1,dep2)
+```
+
+Now, we can look for convergence of the two sets of analyses
+
+```{r "Convergence_corr_anal"}
+# Get effective sizes (should be > 200)
+effectiveSize(ind)
+effectiveSize(dep)
+# Gelman and Rubin's convergence disgnostic
+gelman.diag(ind,autoburnin=FALSE,multivariate=FALSE)
+gelman.diag(dep,autoburnin=FALSE,multivariate=FALSE)
+# Density Plots
+densityplot(ind[,-2])
+densityplot(dep[,-2])
+# Parameter summary
+summary(ind)
+summary(dep)
+```
+
+You can see that the chains have converged well for both models.
+
+## Bayes Factors
+
+To calculate whether there is support for the more complex correlated model, we will use Bayes Factors, which is common for Bayesian analyses. The Bayes Factor (BF) can be calculated the following way:
+
+$$2lnBF=2(lnL_{complex\: model}-lnL_{simpler\: model})$$
+
+To calculate the BF, it is common to use the harmonic mean of the likelihood of each run (but see below). For this, you only use the last value from the complete run.
+
+```{r "Harmonic_means"}
+# Harmonic mean of the independent model
+(ind_harm<-ind.res1$Results$Harmonic.Mean[length(ind.res1$Results$Harmonic.Mean)])
+# Harmonic mean of the dependent model
+(dep_harm<-dep.res1$Results$Harmonic.Mean[length(ind.res1$Results$Harmonic.Mean)])
+# Bayes Factor
+BF = 2*(dep_harm-ind_harm)
+BF
+```
+
+Following Kass and Raftery (1995), BayesFactors can be interpreted the following way:
+
+| 2 ln BF | Interpretation |
+| ------- | -------------- |
+| 0 to 2  | Not worth more than a mention  |
+| 2 to 6  | Positive evidence  |
+| 6 to 10 | Strong evidence  |
+| $> 10$  | Very strong evidence  |
+
+Consequently, you can see that with the present case, there is not support for the more complex model.
+
+> The harmonic mean is not a very good estimator of the likelihood of the model and many suggest it should not be used. BayesTraits has a stepping stone function to better estimate the likelihood and if you plan publishing using Bayes Factors, this is what you should use. Unfortunately, there is no wrapper yet to run this function from R.
+
+# Assignment
+
+No assignment today!
+
+# References
+
+Kass R.E., A.E. Raftery. 1995. Bayes factor. *Journal of the American Statistical Association* 90:773–795.
+
+Pagel M. 1994. Detecting Correlated Evolution on Phylogenies: A General Method for the Comparative Analysis of Discrete Characters. *Proceedings of the Royal Society B* 255:37–45.
+
+Pagel M., A. Meade, D. Barker. 2004. Bayesian estimation of ancestral character states on phylogenies. *Systematic Biology*. 53:673–684.
+
+Paquette A., S. Joly, C. Messier. 2015. Explaining forest productivity using tree functional traits and phylogenetic information: two sides of the same coin over evolutionary scale? *Ecology and Evolution* 5:1774–1783.

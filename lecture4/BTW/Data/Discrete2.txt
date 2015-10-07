@@ -1,0 +1,8 @@
+Cercocebus_torquatus	1	1
+Cercopithecus_mona	0	0
+Cercopithecus_nictitans	0	0
+Colobus_angolensis	0	1
+Colobus_guereza	0	0
+Colobus_polykomos	0	1
+Homo_sapiens	0	0
+Hylobates_agilis	0	0

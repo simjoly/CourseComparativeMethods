@@ -1,0 +1,1 @@
+Cercocebus_torquatus	1Cercopithecus_mona	0Cercopithecus_nictitans	0Colobus_angolensis	1Colobus_guereza	2Colobus_polykomos	-Homo_sapiens	0Hylobates_agilis	01

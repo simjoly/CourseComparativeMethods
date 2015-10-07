@@ -1,0 +1,1 @@
+Cercocebus_torquatus	0.718302851Cercopithecus_mona	0.561939038Cercopithecus_nictitans	0.449604153Colobus_angolensis	0.08233318Colobus_guereza	0.488251416Colobus_polykomos	0.657615152Homo_sapiens	0.553370572Hylobates_agilis	0.166754542

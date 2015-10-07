@@ -54,7 +54,13 @@ Reconstruction of ancestral states on phylogenies for quantitative and qualitati
 
 Bayesian reconstruction of ancestral states using BayesTraits, Testing the correlated evolution of discrete traits, Markov chain Monte Carlo (MCMC) analyses, MCMC chain convergence.
 
-Material to come...
+[Lecture material](./lecture4/)
+
+[BayesTraits Wrapper - BTW](./lecture4/BTW/)
+
+### Tutorials
+
+[BayesTraits](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture4/BayesTraits.html)
 
 ----
 
