@@ -3,13 +3,13 @@ title: "Bayesian ancestral state reconstruction"
 author: "Simon Joly"
 date: "BIO 6008 - Fall 2015"
 output:
-  pdf_document:
-    highlight: default
-    toc: yes
-    toc_depth: 2
   html_document:
     highlight: haddock
     theme: united
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    highlight: default
     toc: yes
     toc_depth: 2
 ---
@@ -396,7 +396,7 @@ Consequently, you can see that with the present case, there is not support for t
 
 # Assignment
 
-No assignment today!
+Please reconstruct the ancestral states of one character on your tree using the method of your choice. Present the analyses and the results in a R Markdown document.
 
 # References
 
