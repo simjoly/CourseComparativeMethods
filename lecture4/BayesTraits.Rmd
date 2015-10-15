@@ -3,13 +3,13 @@ title: "Bayesian ancestral state reconstruction"
 author: "Simon Joly"
 date: "BIO 6008 - Fall 2015"
 output:
+  pdf_document:
+    highlight: default
+    toc: yes
+    toc_depth: 2
   html_document:
     highlight: haddock
     theme: united
-    toc: yes
-    toc_depth: 2
-  pdf_document:
-    highlight: default
     toc: yes
     toc_depth: 2
 ---
@@ -138,7 +138,7 @@ res2 <- mcmc(multistate.MCMC.res2$Results[,c(-1,-4)],
              end=max(multistate.MCMC.res2$Results$Iteration),thin=100)
 res3 <- mcmc(multistate.MCMC.res3$Results[,c(-1,-4)],
              start=min(multistate.MCMC.res3$Results$Iteration),
-             end=max(multistate.MCMC.res2$Results$Iteration),thin=100)
+             end=max(multistate.MCMC.res3$Results$Iteration),thin=100)
 # Combine the three chains
 res <- mcmc.list(res1,res2,res3)
 ```
@@ -215,7 +215,7 @@ res2 <- mcmc(multistate.MCMC.res2$Results[,c(-1,-4)],
              end=max(multistate.MCMC.res2$Results$Iteration),thin=100)
 res3 <- mcmc(multistate.MCMC.res3$Results[,c(-1,-4)],
              start=min(multistate.MCMC.res3$Results$Iteration),
-             end=max(multistate.MCMC.res2$Results$Iteration),thin=100)
+             end=max(multistate.MCMC.res3$Results$Iteration),thin=100)
 # Combine the three chains
 res <- mcmc.list(res1,res2,res3)
 # Get effective sizes (should be > 200)
