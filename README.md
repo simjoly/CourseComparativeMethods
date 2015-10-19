@@ -66,7 +66,13 @@ Bayesian reconstruction of ancestral states using BayesTraits, Testing the corre
 
 ## Lecture 5 - Other methods of trait evolution
 
-Ornstein-Uhlenbeck (OU) model, Early-Burst model, accounting for phylogenetic uncertainty.
+Ornstein-Uhlenbeck (OU) model, Early-Burst model, Speciational model, Simulating data under different evolutionary models, OU models with multiple selection regimes, Accounting for phylogenetic uncertainty.
+
+[Lecture material](./lecture5/)
+
+### Tutorials
+
+[OUModels](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture5/OUModels.html)
 
 ----
 

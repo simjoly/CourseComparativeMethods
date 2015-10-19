@@ -1,0 +1,509 @@
+---
+title: "OU Models"
+author: "Simon Joly"
+date: "BIO 6008 - Fall 2015"
+output:
+  pdf_document:
+    highlight: default
+    toc: yes
+    toc_depth: 2
+  html_document:
+    highlight: haddock
+    theme: united
+    toc: yes
+    toc_depth: 2
+---
+
+We previously saw the Brownian Motion model (lecture 2) to describe the evolution of traits on a phylogeny. Here, we will explore other, more complex evolutionary models.
+
+# Other models of evolution
+
+## The Ornstein-Uhelenbeck (OU) model
+
+The Ornstein-Uhelenbeck (OU) model (Butler and King 2004) is very popular in evolutionary biology. It differs from the BM model by having an optimum trait value and a selecition pressure to maintain (or push) variation towards this optimum.
+
+To refresh our memories, the amount of change for character $X$ over the infinitesimal time in the interval between time $t$ and $t+dt$ for the Brownian Motion model is:
+
+$$dX(t)=\sigma dB(t),$$
+
+where $dB(t)$ is the gaussian distribution.
+
+The OU model is slightly different. First, as mentionned above, it implies that there is an optimal value for the trait. Let's call this optimal value $\theta$. There is also a selection pressure that act to bring the variation towards this optimal value. This selection pressure is normally represented by the Greek letter $\alpha$. Mathematically, the OU model looks like this:
+
+$$dX(t)=\alpha(\theta - X(t))dt + \sigma dB(t).$$
+
+You can see that the right side of the equation for the OU model is identical to the Brownian Motion model. That is, the normal distribution is used to generate variation in the variable of interest. The left side of the formula involves selection. Actually, note that if $\alpha = 0$, which implies that there is no selection, then the OU model collapse to the simpler BM model.
+
+### Interpretation
+
+The OU model can be interpreted in different ways. First, it can be seen as a balancing selection model where selection acts to always bring back the variation towards the optimum. However, in some other cases, it could also represent a directional selection model, in which case selection acts to bring the character to a new value. Actually, the interpretation depends largely on the ancestral value of the trait and the optimum value of the model.
+
+If you remember well from lecture 2, the $\sigma$ parameter was used to control the overall variation the trait. With the OU model, both $\sigma$ and $\alpha$ can play this role. For instance, lets look at the distribution of trait values for characters simulated with different values of $\alpha$ ($\alpha=0.5$ and $\alpha=4$) and $\sigma$ ($\sigma=0.5$ and $\sigma=4$).
+
+```{r "OU_Model_alphaExample", echo=FALSE, fig.height=5, fig.width=5, message=FALSE, fig.align='center'}
+library(phytools)
+library(geiger)
+library(ggplot2)
+nsims=1000
+tree<-pbtree(n=nsims)
+w<-fastBM(rescale(tree,"OU",0.5),sig2=0.5)
+x<-fastBM(rescale(tree,"OU",5),sig2=0.5)
+y<-fastBM(rescale(tree,"OU",0.5),sig2=4)
+z<-fastBM(rescale(tree,"OU",5),sig2=4)
+data<-data.frame(alpha=rep(c("alpha = 0.5","alpha = 4"),each=nsims),sigma=rep(c("sigma = 0.5","sigma = 4"),each=2*nsims),values=c(w,x,y,z))
+ggplot(data,aes(x=values),y=as.factor(alpha))+geom_histogram() +
+  facet_grid(alpha ~ sigma)
+rm(data,w,x,y,z)
+```
+
+As you can see, the distribution of the trait values are very similar for the simulations with  $\alpha=0.5$ and $\sigma=0.5$ to that with $\alpha=4$ and $\sigma=4$. In other words, larger variation with greater selection gives a result similar to small variation and small selection. To be able to distinguish between the OU model and the BM model, it thus becomes important to consider the phylogenetic tree, as you can see that the distribution of the traits alone are not sufficient.
+
+## The early burst (EB) model
+
+This Early-Burst model (Harmon et al. 2010) is also called the ACDC model (for Accelerating-decelerating: Blomberg et al. 2003). The EB model has a rate of evolution that increases or decreases exponentially with time, with the rate increase given by the parameter $a$. For instance, the rate at time $t$ is given by the formula:
+
+$$r(t)=r(0)\times exp(a\times t),$$
+
+where $r(0)$ is the initial rate. 
+
+Let's look at the relationship between the rate and time for different values of the $a$ parameter, supposing that the intial rate is 1.
+
+```{r "EB_model_a_examples", echo=FALSE, fig.height=3, fig.width=5, message=FALSE, fig.align='center'}
+x <- seq(0,2,length.out=1000)
+initial.rate = 1
+h1 <- initial.rate * exp(-1*x)
+h2 <- initial.rate * exp(-0.5*x)
+h3 <- initial.rate * exp(-0.1*x)
+h4 <- initial.rate * exp(0.1*x)
+h5 <- initial.rate * exp(0.5*x)
+h6 <- initial.rate * exp(1*x)
+data<-data.frame(x=x,a=factor(rep(c(-1,-0.5,-0.1,0.1,0.5,1),each=1000)),values=c(h1,h2,h3,h4,h5,h6))
+ggplot(data,aes(x=x,y=values))+geom_line(aes(colour=a))+xlab("time")+ylab("rate")
+rm(data,h1,h2,h3,h4)
+```
+
+Now, let's compare the expectation for a trait distribution for $a=1$ and $a=10$ for the following tree of 500 taxa with total length of 2.
+
+```{r "simulate_pbtree", echo=FALSE, fig.height=3, fig.width=5, message=FALSE, fig.align='center'}
+ntaxa=1000
+atree <- pbtree(n=ntaxa,scale=2)
+plot(atree, show.tip.label = FALSE, no.margin=TRUE)
+add.scale.bar()
+```
+
+Here are the trait distribution expectations.
+
+```{r "EB_Model_Example", echo=FALSE, fig.height=3, fig.width=8, message=FALSE, fig.align='center'}
+h1<-fastBM(rescale(atree,"EB",-1),sig2=0.5)
+h2<-fastBM(rescale(atree,"EB",-0.5),sig2=0.5)
+h3<-fastBM(rescale(atree,"EB",-0.1),sig2=0.5)
+h4<-fastBM(rescale(atree,"EB",0.1),sig2=0.5)
+h5<-fastBM(rescale(atree,"EB",0.5),sig2=0.5)
+h6<-fastBM(rescale(atree,"EB",1),sig2=0.5)
+data<-data.frame(a=factor(rep(c(-1,-0.5,-0.1,0.1,0.5,1),each=ntaxa)),values=c(h1,h2,h3,h4,h5,h6))
+ggplot(data,aes(x=values),y=a)+geom_histogram() + facet_grid(. ~ a)
+rm(atree,data,ntaxa,h1,h2,h3,h4,h5,h6)
+```
+
+As you can see, a greater burst of species early in the tree results in greater observed variation amongst the tips of the tree.
+
+## The punctuational (speciational) model
+
+This is an interesting model in which the amount of character divergence is realted to the number of speciation events between two species. The idea is to transform the branches of the phylogeny so that all branches have the same weight. This is done using the $\kappa$ transform of Pagel's trait evolution models (1999).
+
+> Note that interpretation might be difficult if you do not have a complete taxonomic smapling with this model because some speciation events will be missing from the phylogeny.
+
+## Other models
+
+There are several other models (or tree transformation) that are available. You can read about some of them in the help pages of the `rescale` function of the `geiger` package.
+
+````{r, eval=FALSE}
+require(geiger)
+?rescale
+```
+
+# Fitting different models
+
+The different models of evolution can be fitted using the `fitContinuous` function of the `geiger` package. We will try to fit the different models on the seed plants phylogeny of Paquette et al. (2015).
+
+```{r "Open_seed_plant_data", warning=FALSE}
+require(ape)
+seedplantstree <- read.nexus("./data/seedplants.tre")
+seedplantsdata <- read.csv2("./data/seedplants.csv")
+# Remove species for which we don't have complete data
+seedplantsdata <- na.omit(seedplantsdata)
+# Remove species in the tree that are not in the data matrix
+species.to.exclude <- seedplantstree$tip.label[!(seedplantstree$tip.label %in% 
+                                                   seedplantsdata$Code)]
+seedplantstree <- drop.tip(seedplantstree,species.to.exclude)
+rm(species.to.exclude)
+# Name the rows of the data.frame with the species codes used as tree labels
+rownames(seedplantsdata) <- seedplantsdata$Code
+seedplantsdata <- seedplantsdata[,-1]
+# Order the data in the same order as the tip.label of the tree. In the present 
+# example, this was already the case.
+seedplantsdata <- seedplantsdata[seedplantstree$tip.label,]
+# Extract trait data into vectors
+Wd <- seedplantsdata$Wd
+Shade <- seedplantsdata$Shade
+Sm <- seedplantsdata$Sm
+N <- seedplantsdata$N
+# Important: Give names to your vectors
+names(Wd) <- names(Shade) <- names(Sm) <- names(N) <- row.names(seedplantsdata)
+```
+
+Now, let's fit the wood density (Wd) trait under different models of evolution. Let's start with the Brownian Motion model.
+
+```{r "Fit_BM", warning=FALSE}
+require(geiger)
+wd.bm <- fitContinuous(seedplantstree,Wd,model="BM")
+wd.bm
+```
+
+The results gives a lot of information. It first gives the ML estimates for the 2 parameters of model, $\sigma^2$ and $z_0$, which is the estimated value at the root of the tree. It also gives the log-likelihood and the AIC and AICc.
+
+Let's compare with the OU model.
+
+```{r "Fit_OU", warning=FALSE}
+wd.ou <- fitContinuous(seedplantstree,Wd,model="OU")
+wd.ou
+```
+
+You can see that compared to the BM model, the OU model has the $\alpha$ parameter. In this case, the $z_0$ parameter is both for the ancestral state and the optimal value of the model.
+
+Let's also fit the early-burst and speciational models and make a table to compare them.
+
+```{r "Fit_More_Models", warning=FALSE}
+# Fit the Early-Burst model
+wd.eb <- fitContinuous(seedplantstree,Wd,model="EB")
+# Fit the speciational model
+wd.spe <- fitContinuous(seedplantstree,Wd,model="kappa")
+# Create a table to store de results
+results.evo <- data.frame(model=c("BM","OU","EB","speciational"),
+                          lnL=numeric(4),AICc=numeric(4),params=numeric(4))
+# Put the informtion in the table
+results.evo[1,-1]<-c(wd.bm$opt$lnL,wd.bm$opt$aicc,wd.bm$opt$k)
+results.evo[2,-1]<-c(wd.ou$opt$lnL,wd.ou$opt$aicc,wd.ou$opt$k)
+results.evo[3,-1]<-c(wd.eb$opt$lnL,wd.eb$opt$aicc,wd.eb$opt$k)
+results.evo[4,-1]<-c(wd.spe$opt$lnL,wd.spe$opt$aicc,wd.spe$opt$k)
+# Order the results by AICc
+results.evo <- results.evo[order(results.evo$AICc),]
+results.evo
+```
+
+You can see that the speciational model recieved the best AICc value, which makes it the best model. But as mentionned above, the result from this model needs to be interpreted very carefully. In the present example, there are a lot of species missing from the flowering plant phylogeny. So in this specific case, this model does not make much sense.
+
+It is also possible to test a non-phylogenetic model, which is called "white noise".
+
+```{r "Fit_WN", warning=FALSE}
+wd.wn <- fitContinuous(seedplantstree,Wd,model="white")
+wd.wn
+```
+
+You can see that this model is much better than the other models, but not as much as the speciational model. This would tend to suggest that there are little phylogenetic information in the trait. Again, that could be due to the nature of the traits studied here.
+
+## Interpretation
+
+The results from the fit of the model can be intepreted directly. For instance, if the OU model is prefered to the BM motion model for a given trait, then one might conclude that it has evolved under balancing selection. Alternatively, if the speciation model is prefered, one might conclude that the trait has mostly evolved at the speciation events on the phylogeny (see Joly et al. 2014).
+
+But the models can be of much more use. For instance, they can be used in simulations to predict data with which the empirical data can be compared to. This is what we will see in the next section.
+
+# Simulating data under different models of evolution
+
+It is relatively easy to simulate data under the different evolutionary described above. To do this, we actually use a trick. In practice, the different models described above can all be seen as different ways to give weights to the branches of the phylogeny. At one end of the spectrum, you have the BM model where the branches a not modified. At the other, the white noise model, which is a non phylogenetic model, can be obtained from the BM model by giving branch lengths of 0 to all internal branches of the phylogeny. This gives a star phylogeny in which relationships are not considered.
+
+The other models can be modelled similarly by reshaping the original phylogeny. The function `rescale` of the `geiger` package does just this. For instance, if you want to obtain a phylogeny that would correspond to a OU model with $\alpha=4$ from an initial tree called `a_tree`, you could do the following:
+
+```{r "example_rescale", eval=FALSE}
+ou_tree <- rescale(a_tree, model="OU",4)
+```
+
+To help understand how the tree topologies are affected by the models, let's look at a few examples of tree topologies reshaped to correspond to OU models with different alpha values.
+
+```{r "OU_shapes", echo=TRUE, fig.height=5, fig.width=8, message=FALSE, fig.align='center'}
+# Number of taxa in the tree
+ntaxa=50
+# Simulate a tree
+a_tree<-pbtree(n=ntaxa)
+# A few transformations
+v<-rescale(a_tree,"OU",0.1)
+w<-rescale(a_tree,"OU",0.5)
+x<-rescale(a_tree,"OU",1)
+y<-rescale(a_tree,"OU",2)
+op <- par(mfrow=c(1,4))
+plot(v,show.tip.label = FALSE,no.margin=FALSE,main="alpha = 0.1");add.scale.bar()
+plot(w,show.tip.label = FALSE,no.margin=FALSE,main="alpha = 0.5");add.scale.bar()
+plot(x,show.tip.label = FALSE,no.margin=FALSE,main="alpha = 1");add.scale.bar()
+plot(y,show.tip.label = FALSE,no.margin=FALSE,main="alpha = 2");add.scale.bar()
+par(op)
+rm(atree,ntaxa,v,w,x,y)
+```
+
+You can observe two things when increasing the value of the $\alpha$ parameter. First, the total tree length gets smaller, which will result in species having more similar trait values because it leaves less time to diverge from one another. Second, you can see that the nodes of the tree are pulled towards the base of the tree, which has the consequence of making all species relatively similar. Put it another way, species will not have much more similar trait values with their close relative than to distant species. This is congruent with a OU model that mimicks balancing selection; that is, there is little drift in trait values between lineages.
+
+## Simulations
+
+To perform simulations, we could then use these transformed phylogenies to simulate traits using the Brownian Motion model. The resulting phylogeny will thus reflect traits simulated under the model used to reshape the phylogeny.
+
+For instance, let's simulate a trait under the OU model with $\alpha=1$ and $\sigma^2=0.5$.
+
+```{r "OU_simulation_example", fig.height=3, fig.width=3, message=FALSE, fig.align='center'}
+# Number of taxa in the tree
+ntaxa=50
+# Simulate a tree
+a_tree<-pbtree(n=ntaxa)
+#Simulations
+trait.OU <- fastBM(rescale(a_tree,"OU",1),sig2=0.5)
+data<-data.frame(alpha=1,values=trait.OU)
+ggplot(data,aes(x=values),y=alpha)+geom_histogram(binwidth=0.2)
+```
+
+It is easy to do the same thing with other models of evolution.
+
+# OU model with multiple regimes per tree
+
+In some instances, we might want to evaluate models where different branches of the phylogeny evolve under different selection regimes. Butler and King (2004) have described how to do this. To see how it works, we will use the *Anolis* dataset they used in their paper to illustrate the multiple regime approach. The data describes body size in a group of *Anolis* lizards that evolved sexual dimorphisms in the Antilles. In islands where two species of this group are found, these differ in size. They thus tested whether the small, medium and tall *Anolis* evolved under different selection regimes. We will simplify their analyses here by showing only two of the scenarios tested. One scnenario has an OU model with one regime applied across the whole tree and the second scenario has one OU model but with three regimes, with the regimes painted on the internal branches according to a linear parsimony reconstruction. Let's fit the two models and see what they look like.
+
+```{r "ButlerKing_example"}
+library(ouch)
+# Load the lizard data
+data(bimac)
+# Prepare tree in OUCH format
+tree <- with(bimac,ouchtree(node,ancestor,time/max(time),species))
+# Fit the OU1 model
+h1 <- hansen(log(bimac['size']),tree,bimac['OU.1'],sqrt.alpha=1,sigma=1)
+# Fit the OU3 model
+h2 <- hansen(log(bimac['size']),tree,bimac['OU.LP'],sqrt.alpha=1,sigma=1,reltol=1e-5)
+#Refine the fit of the OU3 model
+h2 <- update(h2,method='subplex',reltol=1e-11,parscale=c(0.1,0.1),hessian=TRUE)
+# Plot the two models
+plot(h1)
+plot(h2)
+```
+
+Now, let's make a table to compare the fit of the two models.
+
+```{r "ButlerKing_example_fit"}
+results <- data.frame(model=c("OU.1","OU.3"),
+                      loglik=c(summary(h1)$loglik,summary(h2)$loglik),
+                      AIC=c(summary(h1)$aic,summary(h2)$aic),
+                      AICc=c(summary(h1)$aic.c,summary(h2)$aic.c),
+                      params=c(summary(h1)$dof,summary(h2)$dof))
+# Reorder according to AICc values
+results <- results[order(results$AICc),]
+results
+```
+
+As you can see, in this example, the more complex model with three regimes (OU3) has a better fit to the data. This indicates that species with different body sizes likely evolved under different selective regimes. To see the fitted parameters values, you can type `h2`.
+
+```{r "ButlerKing_parameter_fit"}
+h2
+```
+
+You can see from the results that the $\alpha$ selection parameter is pretty strong. The results also gives the optimal log body sizes for each regime ($\theta$).
+
+## An example
+
+Let's look at another example with the seed plants data. More specifically, let's test if trees with high shade tolerance evolved under a different regime than trees with low shade tolerance.
+
+To do this, we will use the `ouch` library. Note that it is also possible to fit these models with the `mvMORPH` library.
+
+### Infer ancestral states using diversitree
+
+We will start by reconstructing the ancestral states for shade tolerance on the phylogeny to be able to attribute regimes to all branches of the tree.
+
+```{r "Ancestral_state_reconstruction", fig.align='center', fig.height=5}
+require(diversitree)
+ShadeTol <- seedplantsdata$ShadeTol
+names(ShadeTol) <- rownames(seedplantsdata)
+char1 <- as.numeric(ShadeTol)-1
+names(char1) <- rownames(seedplantsdata)
+# Make mk2 model
+lik.mk2 <- make.mk2(seedplantstree, char1)
+p <- c(.1, .1)
+# Fit mk2 model
+fit.mk2 <- find.mle(lik.mk2, p)
+coef(fit.mk2)
+# Export the marginal ancestral reconstruction at the nodes of the tree
+st <- t(asr.marginal(lik.mk2,coef(fit.mk2)))
+# Get ancestral nodes with maximum likelihood
+anc_node<-factor(character(nrow(st)),levels=levels(ShadeTol))
+for(i in 1:length(anc_node)) {
+  anc_node[i] <- levels(ShadeTol)[st[i,]==max(st[i,])]
+  }
+# Assign ancestral states to tree
+seedplantstree$node.label <- anc_node
+plot(seedplantstree, show.node.label=TRUE,cex=0.6)
+```
+
+### Prepare the data in OUCH format
+
+Then, we need to convert the data into the ouch format. OUCH uses a rather peculiar format for the data and the conversion is not so simple.
+
+```{r "ape_to_ouch"}
+# Convert the ape tree into ouch format
+tree.ouch <- ape2ouch(seedplantstree)
+tree.ouch <- as(tree.ouch,"data.frame")
+# Here is what it looks like:
+head(tree.ouch,n=20)
+#
+# Prepare data:
+# We need to make a vector of the regimes. Need to copy the labels
+# already in the ouch tree dataframe and the tip values in the same
+# order as the taxa are in the ouch tree
+regimes <- c(tree.ouch$labels[round(tree.ouch$times,3)!=1],
+    as.numeric(ShadeTol[as.vector(tree.ouch$labels[round(tree.ouch$times,3)==1])]))
+# Add the regime to the data.frame
+tree.ouch$ShadeTol<-as.factor(regimes)
+# Add a fake regime to the data.frame for the OU1 model
+tree.ouch$ou1<-as.factor(rep(1,length.out=length(regimes)))
+# Create a data.frame with the data to analyse (Wood density)
+oudata <- data.frame(labels=rownames(seedplantsdata),Wd=seedplantsdata$Wd)
+# Merge the data with the ouch tree
+oudata <- merge(tree.ouch, oudata, by="labels",all=T)
+row.names(oudata)<-oudata$nodes
+# Create a new OUCH tree with the final information
+outree<-ouchtree(nodes= oudata$nodes, ancestors=oudata$ancestors, 
+                 times=oudata$times, labels=oudata$labels)
+# Here is what it should now look like:
+outree
+```
+
+### Fit different models
+
+Three different models will be fitted.
+
+1. A BM model with one regime (BM.1)
+1. A OU model with one regime (OU.1)
+1. A OU model with two regimes (OU.2)
+
+```{r "OUCH_Fit_models"}
+#
+# Fit the models
+#
+# BM1
+BM.1<-brown(data=oudata["Wd"], tree=outree)
+#
+# OU1
+OU.1 <- hansen(data=oudata["Wd"], tree=outree, oudata["ou1"],
+               sqrt.alpha=1, sigma=1,reltol=1e-5)
+# Refine the fit
+OU.1 <- update(OU.1,method='subplex',reltol=1e-11,
+               parscale=c(0.1,0.1),hessian=TRUE)
+#
+# OU2
+OU.2 <- hansen(data=oudata["Wd"], tree=outree, oudata["ShadeTol"],
+               sqrt.alpha=1,sigma=1,reltol=1e-5)
+# Refine the fit
+OU.2 <- update(OU.2,method='subplex',reltol=1e-11,
+               parscale=c(0.1,0.1),hessian=TRUE)
+```
+
+Finally, we can summarize and plot the results
+
+```{r "OUCH_Results"}
+#
+#Summarize the results
+results <- data.frame(model=c("BM.1","OU.1","OU.2"),
+  loglik=c(summary(BM.1)$loglik,summary(OU.1)$loglik,summary(OU.2)$loglik),
+  AIC=c(summary(BM.1)$aic,summary(OU.1)$aic,summary(OU.2)$aic),
+  AICc=c(summary(BM.1)$aic.c,summary(OU.1)$aic.c,summary(OU.2)$aic.c),
+  params=c(summary(BM.1)$dof,summary(OU.1)$dof,summary(OU.2)$dof))
+results <- results[order(results$AICc),]
+results
+```
+
+You can see that the model OU.1, that is a OU model with one regime across the whole tree, has the best fit. We can summarize the results and plot the model details.
+
+```{r "Model_summary"}
+#
+# Plot the tree with the best model
+plot(OU.1)
+#
+# Output model information
+summary(OU.1)
+```
+
+## Recent developments
+
+Since the publication of Butler and King (2004), more developments were made on OU models. In the example above, it was possible to have multiple regimes on a tree, but the $\alpha$ and $\sigma$ parameters were the same for all regimes. Beaulieu et al. (2012) have relaxed this assumption and have proposed more general Hansen models (another name for the OU model) that can allow either $\alpha$, $\sigma$ or both to vary among regimes on a tree. These models are available in the `R` package `ouwie`. Note that many species are necessary if you want to fit the most parameter rich models.
+
+Another addition is to fit multiple traits at oncee. Bartoszek et al. (2012) have described how to do so. In short, it allows fitting a OU model on multiple parameters at once. These functions are available in the `R` packages `mvSLOUCH` and `mvMORPH`.
+
+# Incorporating phylogenetic uncertainty
+
+It is very unfrequent to have 100% confidence in the species tree of the group under study. When the relationships are not completely certain, it is generally important to take this uncertainty into account in the statistical tests performed. For instance, you might wonder what the results would give if a given species was placed at another position on the tree for which support is considerable.
+
+Actually, even if you have very poorly supported phylogenies, you might nevertheless be able to reach strong conclusions if you incorporate this uncertainty appropriately into the analyses. For instance, if the results are significant when incorporating phylogenetic uncertainty into account, then you can conclude that the effect are likely true across the sample of tree considered.
+
+We saw in the previous lecture that BayesTraits allows to incorporate phylogenetic uncertainty in a Bayesian framework by giving a list of trees to the program. The same thing can be done with stochastic mapping, which we saw in lecture 3. These are interesting approaches. But in general, it is possible to incorporate phylogenetic uncertainty even when the methods do not integrate this inherently. The trick is to perform the analyses on a list of trees that represent the phylogenetic uncertainty of the data. These could be random samples from the posterior distribution of a tree search, for example. Then, the conclusions are taken on the set of analyses that were performed.
+
+Here, we will evaluate the fit of different evolutionary models on a sample of 500 trees sampled from the posterior distribution of trees obtained from a Bayesian BEAST search on the seedplantsdata.
+
+List of trees are generaly handle as Multiphylo objects in `R`. These require sligthly different approaches to manipulate them. Let's first prepare the data.
+
+```{r "Read_trees"}
+# Read trees
+pdtrees <- read.nexus("./data/pd_500.trees")
+species.to.exclude <- pdtrees[[1]]$tip.label[!(pdtrees[[1]]$tip.label %in% 
+                                  rownames(seedplantsdata))]
+# Exclude species from all trees using the function lapply
+pdtrees<-lapply(pdtrees,drop.tip,tip=species.to.exclude)
+# Reattribute the list of tree a class multiphylo
+class(pdtrees)<-"multiPhylo"
+# Assign tip labels to the multiphylo object
+attr(pdtrees,"TipLabel") <- pdtrees[[1]]$tip.label
+rm(species.to.exclude)
+```
+
+Now, we will fit the models BM and OU on all 500 trees for wood density (if you try it, you might want to try with fewer replicates as 500 takes quite some time to run). The important thing is to compare the fit of the models for the same trees, as comparing the fit obtained with different trees is meaningless. The trick is to save the model fits for all trees and then compare the fit of models relative to a reference one (often the BM model). This is commonly done by substrating the AIC value of the reference model (BM) with the AIC of the alternative models for each tree. A positive difference would indicate support for the alternative model because it would mean that the AIC for the alternative model is smaller.
+
+```{r "Fit_models_posterior_sample", message=FALSE, warning=FALSE, fig.align='center',fig.width=4,fig.height=3}
+# Replicates (here max 500)
+replicates = 500
+# Prepare vectors to store the results
+bm.post <- numeric(replicates)
+ou.post <- numeric(replicates)
+# Make a loop to evaluate each tree in the list
+for (i in 1:replicates) {
+  message(cat("\n########################\n Processing tree",i,
+              "\n########################\n"))  
+  atree<-pdtrees[[i]]
+  fit.bm <- fitContinuous(atree,Wd,model="BM")
+  fit.ou <- fitContinuous(atree,Wd,model="OU",bounds=list(alpha=c(0,1000)))
+  # Store the AICc in the vectors
+  bm.post[i] <- fit.bm$opt$aicc
+  ou.post[i] <- fit.ou$opt$aicc
+}
+# Now, compare the OU model relative to the BM model
+comparisons <- data.frame(OU=bm.post-ou.post)
+results <- stack(comparisons)
+colnames(results) <- c("delta_AICc","Model")
+# Plot the results
+require(ggplot2)
+ggplot(results,aes(x=delta_AICc)) + geom_histogram(aes(fill=Model),binwidth=10)
+```
+
+Because the distribution of values is positive, it supports the OU model over the BM (reference) model. In other words, the OU model has a smaller AICc value than the BM model for most of the trees (it can vary from one simulation to the next). 
+
+To make a definive conclusion, you need to confirm that the 95% credible interval excludes 0. This 95% CI can be obtained the following way:
+
+```{r "95%CI"}
+# Get 95% Credible intervals
+apply(comparisons,2,function(x) quantile(x,probs=c(0.025,0.5,0.975)))
+```
+
+As you can see, the 95% credible interval exclude 0 and thus the results are signifcant at the $\alpha=0.05$ level. Consequently, you can conclude from these results that it is possible to definitively accept the OU model as the best model even when taking into account phylogenetic uncertainty.
+
+# References
+
+Bartoszek K., J. Pienaar, P. Mostad, S. Andersson, T.F. Hansen. 2012. A phylogenetic comparative method for studying multivariate adaptation. *Journal of Theoretical Biology*. 314:204–215.
+
+Beaulieu J.M., D.-C. Jhwueng, C. Boettiger, B.C. O’Meara. 2012. Modeling stabilizing selection: expanding the Ornstein–Uhlenbeck model of adaptive evolution. *Evolution*. 66:2369–2383.
+
+Blomberg S.P., T. Garland, A.R. Ives. 2003. Testing for phylogenetic signal in phylogenetic comparative data: behavioral traits are more labile. *Evolution*. 57:717-745.
+
+Butler M.A., A.A. King. 2004. Phylogenetic Comparative Analysis: A Modeling Approach for Adaptive Evolution. *The American Naturalist*. 164:683–695.
+
+Joly S., P.B. Heenan, P.J. Lockhart. 2014. Species radiation by niche shifts in New Zealand’s rockcresses (Pachycladon, Brassicaceae). *Systematic Biology*. 63:192–202.
+
