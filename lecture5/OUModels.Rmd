@@ -304,7 +304,7 @@ You can see from the results that the $\alpha$ selection parameter is pretty str
 
 ## An example
 
-Let's look at another example with the seed plants data. More specifically, let's test if trees with high shade tolerance evolved under a different regime than trees with low shade tolerance.
+Let's look at another example with the seed plants data. More specifically, let's test if the wood density (Wd) of trees with high shade tolerance evolved under a different regime than the wood density of trees with low shade tolerance. To do this, we will have to first reconstruct the ancestral states for the shade tolerance character to "paint" regimes on the tree. And then we will fit the wood density data using different evolutionary models.
 
 To do this, we will use the `ouch` library. Note that it is also possible to fit these models with the `mvMORPH` library.
 
@@ -314,10 +314,12 @@ We will start by reconstructing the ancestral states for shade tolerance on the 
 
 ```{r "Ancestral_state_reconstruction", fig.align='center', fig.height=5}
 require(diversitree)
-ShadeTol <- seedplantsdata$ShadeTol
+# Extract Shade Tolerance in binary format
+ShadeTol <- seedplantsdata$ShadeTolBin
 names(ShadeTol) <- rownames(seedplantsdata)
 char1 <- as.numeric(ShadeTol)-1
 names(char1) <- rownames(seedplantsdata)
+# Note that state 0 = high tolerance
 # Make mk2 model
 lik.mk2 <- make.mk2(seedplantstree, char1)
 p <- c(.1, .1)
@@ -413,16 +415,18 @@ results <- results[order(results$AICc),]
 results
 ```
 
-You can see that the model OU.1, that is a OU model with one regime across the whole tree, has the best fit. We can summarize the results and plot the model details.
+You can see that the model OU.1, that is a OU model with one regimes across the whole tree, has the best fit. We could thus reject the hypothesis that the wood density of species with low shade tolerance is evolving under a different selective regime than for species with high shade tolerance. We can summarize the results and plot the model details.
 
 ```{r "Model_summary"}
 #
 # Plot the tree with the best model
-plot(OU.1)
+plot(OU.2)
 #
 # Output model information
-summary(OU.1)
+summary(OU.2)
 ```
+
+This conclusion is different from the conclusion reached with the PGLS (lecture 2) where a positive relationship was observed between shade tolerance and wood density. This might be explained by the loss on information involved with the conversion of the shade data into a binary vector.
 
 ## Recent developments
 
