@@ -44,7 +44,7 @@ Reconstruction of ancestral states on phylogenies for quantitative and qualitati
 
 [Lecture material](./lecture3/)
 
-### Tutorials
+### Tutorial
 
 [Ancestral states reconstruction](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture3/AncestralStatesReconstruction.html)
 
@@ -58,7 +58,7 @@ Bayesian reconstruction of ancestral states using BayesTraits, Testing the corre
 
 [BayesTraits Wrapper - BTW](./lecture4/BTW/)
 
-### Tutorials
+### Tutorial
 
 [BayesTraits](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture4/BayesTraits.html)
 
@@ -70,21 +70,27 @@ Ornstein-Uhlenbeck (OU) model, Early-Burst model, Speciational model, Simulating
 
 [Lecture material](./lecture5/)
 
-### Tutorials
+### Tutorial
 
 [OUModels](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture5/OUModels.html)
+
+----
+
+## Lecture 6 - Phylogenetic signal and phylogenetic diversity
+
+Phylogenetic signal (Moran's I, Abouheif's c, Pagel's lambda, Blomberg's K, Moran's I correlograms); Phylogenetic diversity; Evolutionary distinctiveness; phylogenetic beta-diversity; Parametric bootstrapping; Phylogenies in community ecology.
+
+[Lecture material](./lecture6/)
+
+### Tutorial
+
+[Phylogenetic signal and PD](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture6/PD.html)
 
 ----
 
 ## Lecture 6 - Diversification analyses
 
 Lineage through-time plots; diversification rate estimation; Trait dependent speciaton and extinction (BISSE model)
-
-----
-
-## Lecture 7 - Phylogenetic information and diversity
-
-Phylogenetic information ($\lambda$, Blomberg's K, Abouheif); Phylogenetic diversity; phylogenetic beta-diversity
 
 ----
 
