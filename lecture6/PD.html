@@ -120,7 +120,7 @@ img {
 <li><a href="#phylogenetic-species-variability-psv">Phylogenetic species variability (PSV)</a></li>
 <li><a href="#other-measures-of-pd">Other measures of PD</a></li>
 </ul></li>
-<li><a href="#phylogenetic-distinctiveness">Phylogenetic distinctiveness</a></li>
+<li><a href="#evolutionary-distinctiveness">Evolutionary distinctiveness</a></li>
 <li><a href="#phylogenetic-beta-diversity">Phylogenetic beta diversity</a></li>
 <li><a href="#phylogenies-in-community-ecology">Phylogenies in community ecology</a></li>
 <li><a href="#references">References</a></li>
@@ -213,11 +213,11 @@ w &lt;-<span class="st"> </span><span class="kw">proxTips</span>(seedplantstree,
 ## Adjustment method for multiple comparisons:   none 
 ## Permutation number:   999 
 ##    Test       Obs  Std.Obs   Alter Pvalue
-## 1  maxH 0.3297438 3.711328 greater  0.001
-## 2    Wd 0.5209647 5.750307 greater  0.001
-## 3    Sm 0.6076848 7.977162 greater  0.001
-## 4 Shade 0.3916910 4.293800 greater  0.001
-## 5     N 0.6526499 7.242262 greater  0.001
+## 1  maxH 0.3297438 3.646770 greater  0.001
+## 2    Wd 0.5209647 5.744547 greater  0.001
+## 3    Sm 0.6076848 7.745314 greater  0.001
+## 4 Shade 0.3916910 4.431960 greater  0.001
+## 5     N 0.6526499 7.263736 greater  0.001
 ## 
 ## other elements: adj.method call</code></pre>
 <p>Again, the results show that all parameter have significant phylogenetic signal.</p>
@@ -249,10 +249,10 @@ for (i in <span class="dv">1</span>:<span class="kw">length</span>(traits)) {
 }
 (results &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">traits=</span>traits,<span class="dt">lambda=</span>lambda,<span class="dt">lnL=</span>lnL,<span class="dt">AICc=</span>aicc,<span class="dt">df=</span>params))</code></pre></div>
 <pre><code>##   traits    lambda        lnL       AICc df
-## 1   maxH 0.4915435 -206.66282  419.77848  3
-## 2     Wd 0.7630391   58.99352 -111.53422  3
-## 3     Sm 0.9084535 -521.90987 1050.27258  3
-## 4  Shade 0.9483531  -83.06946  172.59175  3
+## 1   maxH 0.4915338 -206.66282  419.77848  3
+## 2     Wd 0.7630357   58.99352 -111.53422  3
+## 3     Sm 0.9084331 -521.90987 1050.27258  3
+## 4  Shade 0.9483634  -83.06946  172.59175  3
 ## 5      N 0.6661551  -18.06712   42.58707  3</code></pre>
 <p>This is nice, but it doesn’t say if it is significant or not. To test this, we need to compare the model fit with that of a model in which <span class="math inline">\(\lambda\)</span> is fixed to 0. To do this, we will reshape the phylogeny as we saw in the last lecture. The trick is to reshape the phylogeny using a <span class="math inline">\(\lambda\)</span> model with value 0, and then fit a BM model on this phylogeny. This will git the fit of the model with <span class="math inline">\(\lambda=0\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(geiger)
@@ -286,17 +286,18 @@ d.aicc &lt;-<span class="st"> </span>aicc<span class="fl">.0</span> -<span class
 <span class="co"># Print the results</span>
 <span class="kw">data.frame</span>(<span class="dt">traits=</span>traits,<span class="dt">lambda=</span>lambda,<span class="dt">p.value=</span><span class="kw">round</span>(pval,<span class="dv">4</span>),<span class="dt">delta.AICc=</span><span class="kw">round</span>(d.aicc,<span class="dv">2</span>))</code></pre></div>
 <pre><code>##   traits    lambda p.value delta.AICc
-## 1   maxH 0.4915435  0.4408      -1.64
-## 2     Wd 0.7630391  0.0002      11.33
-## 3     Sm 0.9084535  0.0000      16.32
-## 4  Shade 0.9483531  0.0012       8.24
+## 1   maxH 0.4915338  0.4408      -1.64
+## 2     Wd 0.7630357  0.0002      11.33
+## 3     Sm 0.9084331  0.0000      16.32
+## 4  Shade 0.9483634  0.0012       8.24
 ## 5      N 0.6661551  0.0000      43.85</code></pre>
 <p>This table give the estimated <span class="math inline">\(\lambda\)</span> parameter, the p-value in favor of the more complex model (that is <span class="math inline">\(\lambda \neq 0\)</span>), and the <span class="math inline">\(\Delta AICc\)</span> where a positive value supports the more complex model (that is <span class="math inline">\(\lambda \neq 0\)</span>). In this case, the two approaches give the same conclusions. All paramters are found to have significant phylogenetic signal, except for maximum height.</p>
 </div>
 </div>
 <div id="blombergs-k" class="section level2">
 <h2>Blomberg’s <span class="math inline">\(K\)</span></h2>
-<p>Blomberg’s <span class="math inline">\(K\)</span> expresses the strength of phylogenetic signal as the ratio of the mean squared error of the tip data (<span class="math inline">\(MSE_0\)</span>) measured from the phylogenetic corrected mean and the mean squared error based on the variance–covariance matrix derived from the given phylogeny under the assumption of BM (MSE, Blomberg, Garland &amp; Ives 2003). In a case in which the similarity of trait values is well predicted by the phylogeny, <span class="math inline">\(MSE\)</span> will be small and thus <span class="math inline">\(\frac{MSE_0}{MSE}\)</span> large. To make the resulting value comparable to other trees with different sizes and shapes, this ratio is standardized by the analytically derived expectation for the ratio under BM evolution. <span class="math inline">\(K\)</span> is computed as:</p>
+<p>Blomberg et al. (2003) suggested to estimate the phylogenetic signal as the ratio of <span class="math inline">\(MSE_0\)</span>, the <em>mean squared error</em> of the tip data to the phylogenetically corrected mean (the value at the root of the tree), to <span class="math inline">\(MSE\)</span>, the <em>mean squared error</em> of the data to the values expected under Brownian Motion model. When trait values is well predicted by the phylogeny, <span class="math inline">\(MSE\)</span> will be small and thus <span class="math inline">\(\frac{MSE_0}{MSE}\)</span> large.</p>
+<p>To make the resulting value comparable to other trees with different sizes and shapes, this ratio is standardized by the analytically derived expectation for the ratio under BM evolution. <span class="math inline">\(K\)</span> is computed as:</p>
 <p><span class="math display">\[K=\frac{\mathrm{observed}\frac{MSE_0}{MSE}}{\mathrm{expected}\frac{MSE_0}{MSE}}\]</span></p>
 <p>Blomberg’s <span class="math inline">\(K\)</span> can be estimated using the function <code>phylosignal</code> of the <code>picante</code> package.</p>
 <div id="example-3" class="section level3">
@@ -311,9 +312,9 @@ d.aicc &lt;-<span class="st"> </span>aicc<span class="fl">.0</span> -<span class
 ## required to match phylogeny and data. Data are returned unsorted. Assuming
 ## that data and phy$tip.label are in the same order!</code></pre>
 <pre><code>##           K PIC.variance.obs PIC.variance.rnd.mean PIC.variance.P
-## 1 0.0469481         2.339215              10.33851          0.001
+## 1 0.0469481         2.339215              10.29843          0.001
 ##   PIC.variance.Z
-## 1      -2.401307</code></pre>
+## 1      -2.343827</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Let's compute Blomberg's K for all characters</span>
 res &lt;-<span class="st"> </span><span class="kw">apply</span>(seedplantsdata,<span class="dv">2</span>,function(x) <span class="kw">phylosignal</span>(x,seedplantstree))
 K &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">unlist</span>(res),<span class="dt">ncol=</span><span class="dv">5</span>,<span class="dt">byrow=</span><span class="ot">TRUE</span>,
@@ -322,17 +323,17 @@ K &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">
                 <span class="st">&quot;PIC.variance.P&quot;</span>,<span class="st">&quot;PIC.variance.Z&quot;</span>)))
 K</code></pre></div>
 <pre><code>##                K PIC.variance.obs PIC.variance.rnd.mean PIC.variance.P
-## maxH  0.01885410     4.573630e+04          9.086303e+04          0.043
-## Wd    0.04694810     2.339215e+00          1.019594e+01          0.001
-## Sm    0.07088576     1.126973e+09          7.694761e+09          0.012
-## Shade 0.03222634     4.134031e+02          1.435081e+03          0.001
-## N     0.07701311     4.231345e+01          2.683290e+02          0.001
+## maxH  0.01885410     4.573630e+04          9.011033e+04          0.034
+## Wd    0.04694810     2.339215e+00          1.037736e+01          0.001
+## Sm    0.07088576     1.126973e+09          8.157514e+09          0.016
+## Shade 0.03222634     4.134031e+02          1.426935e+03          0.002
+## N     0.07701311     4.231345e+01          2.721529e+02          0.001
 ##       PIC.variance.Z
-## maxH       -1.488009
-## Wd         -2.363689
-## Sm         -1.123617
-## Shade      -2.282052
-## N          -2.443894</code></pre>
+## maxH       -1.492597
+## Wd         -2.482884
+## Sm         -1.140252
+## Shade      -2.143241
+## N          -2.475143</code></pre>
 <p>The results show that all paramter have significant phylogenetic signal. Maximum height is only marginally significant though, siggesting a weeker phylogenetic signal.</p>
 </div>
 </div>
@@ -508,8 +509,8 @@ lambdadata &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<spa
 <p>Other measures of PD have been proposed, many of which have been described by Cadotte et al. (2010). Some are more interesting for phylogenetic (conservation) studies whereas others are more interesting for community studies.</p>
 </div>
 </div>
-<div id="phylogenetic-distinctiveness" class="section level1">
-<h1>Phylogenetic distinctiveness</h1>
+<div id="evolutionary-distinctiveness" class="section level1">
+<h1>Evolutionary distinctiveness</h1>
 <p>Phylogenetic diversity is very present in the conservation literature, but there are other ways phylogenies can be incorporated into statistic that could be useful for conservation. One statistic that is relatively popular is Evolutionary Distinctiveness (ED: Redding and Mooers, 2006). ED represents the evolutionary history that is unique to a species in a given sample. Practically, it is the length of the branch on the tree that links the species to the rest of the tree (i.e., the length of the terminal branch). So species that are on longer branches have higher evolutionary distinctiveness. Another way to look at it is that <em>living fossils</em> such as gingkos or coleocanths will have high ED compared to dandelions or finches, respectively.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">evol.distinct</span>(seedplantstree)</code></pre></div>
 <pre><code>##    Species           w
@@ -573,7 +574,7 @@ lambdadata &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<spa
 </div>
 <div id="phylogenetic-beta-diversity" class="section level1">
 <h1>Phylogenetic beta diversity</h1>
-<p>Diveristy can be divided in three components: <span class="math inline">\(\alpha\)</span> diversity, which represents the diversity ofberved at a given site, <span class="math inline">\(\beta\)</span> diversity, which represents the diversity among sites, and <span class="math inline">\(\gamma\)</span> diversity, which represents the total diversity. The PD statistic can provide a measure of the <span class="math inline">\(\alpha\)</span> or <span class="math inline">\(\gamma\)</span> diversity. However, it is sometimes of interest to measure the amount of variation between sites, that is the <span class="math inline">\(\beta\)</span> diversity.</p>
+<p>Diversity can be divided in three components: <span class="math inline">\(\alpha\)</span> diversity, which represents the diversity ofberved at a given site, <span class="math inline">\(\beta\)</span> diversity, which represents the diversity among sites, and <span class="math inline">\(\gamma\)</span> diversity, which represents the total diversity. The PD statistic can provide a measure of the <span class="math inline">\(\alpha\)</span> or <span class="math inline">\(\gamma\)</span> diversity. However, it is sometimes of interest to measure the amount of variation between sites, that is the <span class="math inline">\(\beta\)</span> diversity.</p>
 <p>Several measures of <span class="math inline">\(\beta\)</span> phylogenetic diversity have been proposed (Swenson 2011), although several of these are very similar (Sewnson 2011). We will see a popular statistic here, that is <span class="math inline">\(Phylosor\)</span>, which converge to the Sorensen Index when there is no phylogenetic information. <span class="math inline">\(Phylosor\)</span> is defined as</p>
 <p><span class="math display">\[Phylosor=\frac{BL_{k_1k_2}}{(BL_{k1}+BL_{k2})\times \frac{1}{2}}\]</span></p>
 <p>where <span class="math inline">\(BL_{k_1k_2}\)</span> is the total length of the branches shared between community <span class="math inline">\(k_1\)</span> and <span class="math inline">\(k_2\)</span>, <span class="math inline">\(BL_{k_1}\)</span> and <span class="math inline">\(BL_{k_2}\)</span> are the total branch lengths found in communities <span class="math inline">\(k_1\)</span> and <span class="math inline">\(k_2\)</span> respectively.</p>
@@ -631,19 +632,19 @@ ses.mpd.result &lt;-<span class="st"> </span><span class="kw">ses.mpd</span>(phy
 <span class="dt">abundance.weighted =</span> <span class="ot">FALSE</span>, <span class="dt">runs =</span> <span class="dv">999</span>)
 ses.mpd.result</code></pre></div>
 <pre><code>##         ntaxa  mpd.obs mpd.rand.mean mpd.rand.sd mpd.obs.rank   mpd.obs.z
-## clump1      8 4.857143      8.323967   0.3223259          1.0 -10.7556498
-## clump2a     8 6.000000      8.321965   0.3448181          1.0  -6.7338838
-## clump2b     8 7.142857      8.345274   0.3054019          5.5  -3.9371623
-## clump4      8 8.285714      8.341770   0.3146876        360.5  -0.1781324
-## even        8 8.857143      8.315673   0.3259751        998.5   1.6610778
-## random      8 8.428571      8.306664   0.3368032        553.5   0.3619551
+## clump1      8 4.857143      8.309524   0.3178982          1.0 -10.8600207
+## clump2a     8 6.000000      8.305520   0.3529252          1.0  -6.5326011
+## clump2b     8 7.142857      8.333548   0.3048705          4.5  -3.9055616
+## clump4      8 8.285714      8.342843   0.3195340        360.5  -0.1787871
+## even        8 8.857143      8.316245   0.3275804        998.5   1.6511915
+## random      8 8.428571      8.321250   0.3291471        557.0   0.3260597
 ##         mpd.obs.p runs
 ## clump1     0.0010  999
 ## clump2a    0.0010  999
-## clump2b    0.0055  999
+## clump2b    0.0045  999
 ## clump4     0.3605  999
 ## even       0.9985  999
-## random     0.5535  999</code></pre>
+## random     0.5570  999</code></pre>
 <p>The output includes the following columns:</p>
 <ul>
 <li>ntaxa: Number of taxa in community</li>
