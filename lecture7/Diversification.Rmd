@@ -1,0 +1,311 @@
+---
+title: "Diversification"
+author: "Simon Joly"
+date: "BIO 6008 - Fall 2015"
+output:
+  html_document:
+    highlight: haddock
+    theme: united
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    highlight: default
+    toc: yes
+    toc_depth: 2
+---
+
+
+## Empirical data
+
+For the present tutorial, we will use data from Sánchez-Baracaldo and Thomas (2014) that studied a group of monophyletic ferns from the Jamesonia-Eriosorus Complex from the Andes. They studied mostly the impact of the colonization of the Paramo habitat in diversification rates and on morphology.
+
+```{r "paramo data", message=FALSE}
+require(ape)
+paramotree <- read.nexus("./data/JamesoniaPartFind_MCC.tre")
+paramodata <- read.csv("./data/JamesoniaTraits2014Analysis.csv")
+# Remove species for which we don't have complete data
+paramodata <- paramodata[!is.na(paramodata$Name_in_tree),]
+# Remove species in the tree that are not in the data matrix
+species.to.exclude <- paramotree$tip.label[!(paramotree$tip.label %in% 
+                                                   paramodata$Name_in_tree)]
+paramotree <- drop.tip(paramotree,species.to.exclude)
+rm(species.to.exclude)
+# Name the rows of the data.frame with the species codes used as tree labels
+rownames(paramodata) <- paramodata$Name_in_tree
+# Remove unecessary variables
+paramodata <- paramodata[,-c(1:3,7:14)]
+# Order the data in the same order as the tip.label of the tree. In the
+# present example, this was already the case.
+paramodata <- paramodata[paramotree$tip.label,]
+```
+
+# Diversification rate
+
+Diversification consists in the net accumulation of species through time. Basically, it consists of the speciation rate, formally defined as $\lambda$, minus the extinction rate, $\mu$. If speciation rates are larger than extinction rates ($\lambda > \mu$), then the diversification rate is positive and the number of species in a group will increase. In contrast, if speciation rates are smaller than extinction rates ($\lambda < \mu$), then the diversification rate is negative and species number are diminishing through time in the group.
+
+Diversification rates are estimated as the expected number of species that will be created from one species in a given amount of time. In a phylogenetic perspective, you can see this as the mean number of new lineages that will be created from one lineage in a given amount of time. This logic is also used in mathematical models that simulate phylogenies. They use a probability that any given lineage will speciate at any given time.
+
+There are two main models for tree 'construction'. The first one only considers speciation and assume that there is no extinction. This is called the Yule model, or a pure birth model. The second model considers both speciation and extinction. This is the birth-death model. There are many other more complicated models, but they are less frequent in the literature and generally more complex. They often have speciation rates that vary according to other paramters (time, density-dependent, etc.).
+
+Since there are mathematical models to simulate phylogenetic trees, this means we can also use these models to estimate parameter values using maximum likelihood. This allows to estimate diversification rates from a phylogeny. Here, we will use the package `laser` to estimate diversification rates. We will get diversification rates for a Yule model (pure birth) and a birth-death model. The corresponding functions in `laser` use branching times as input.
+
+To get a calibrated rate of diversification per year, you need to give the total age of the tree (if it is not already defined by the branches lengths, such as when they are measured in years). In the present example, the branch lengths are already calibrated in number of years. If it was not the case, we could have calibrated the branching times in the function `scaleBranchingtimes` using the `basal = ` argument.
+
+
+```{r "Diversification_rate", message=FALSE}
+# Load packages
+require(ape)
+require(geiger)
+require(laser)
+# Estimate the diversification rate under a pure birth model. Because there
+# is no extinction, the diversification rate equals the speciation rate.
+diver.pb <- pureBirth(scaleBranchingtimes(getBtimes(string=write.tree(paramotree))))
+# Estimate diversification times under a birth and death model
+diver.bd <- bd(scaleBranchingtimes(getBtimes(string=write.tree(paramotree))))
+results <- data.frame(model=c("Yule","birth-death"),
+                      lambda=c(round(diver.pb$r1[[1]],3),round(diver.bd$r1,3)),
+                      mu=c(0,diver.bd$a),
+                      lnL=c(diver.pb$LH[[1]],diver.bd$LH),
+                      aic=c(diver.pb$aic[[1]],diver.bd$aic))
+# Order the lines from lowest AIC to higest AIC
+results <- results[order(results$aic),]
+results
+```
+
+The results show that the birth-death model has a better fit (lower AIC). This model estimated a large extinction rate, which means that it indeed departs relatively importantly from a pure birth model. It suggests a speciation rate of `r round(diver.bd$r1,3)` species per lineage per million of years, with an extinction rate of `r round(diver.bd$a,3)` species per lineage per million of years. You can see that it is a bit odd that the extinction rate is much higher than the speciation rate. We'll get back to this later.
+
+## Lineage through time plots
+
+Another way to look at diversification is too look at the speed at which lineages have accumulated through time. According to a Yule model (i.e., no extinction), the species number should increase exponentially through time. You can check how the data departs from this expectation using lineage through time plots (ltt plots). These can be obtained using the `ltt` function of the `phytools` package.
+
+Let's first look at the species tree.
+
+```{r "plot_tree", fig.height=6,fig.width=7}
+plot(paramotree,show.tip.label=TRUE,cex=0.5)
+```
+
+You can see that there are long branches at the base of the tree, which appears slightly unusual for a Yule tree. For comparison, see how a random Yule tree look like:
+
+```{r "plot_purebirth_tree", fig.height=4,fig.width=7, message=FALSE}
+require(phytools)
+plot(pbtree(b=0.81,n=61),show.tip.label=FALSE)
+```
+
+Now, let's have a look at the ltt plot.
+
+```{r "ltt"}
+res<-ltt(paramotree)
+```
+
+First, notice that the y axis is on a log scale. This is useful because the expectation for a Yule tree is that the number of species will increase exponentially with time (because each new species imply a new lineage from which new species can evolved, which will make new lineages, and so on). Consequently, this imply that on a log scale, the increase in the number of species should be linear. You can see that there is no species increase for the first 2 million years, and little until 3 million years. In contrast, the species number (on a log scale) for the last million of years has been increasing linearly with time, which implies an exponential growth for the last million of years.
+
+You can compare this plot with expectations from a Yule model.
+
+```{r "ltt_null"}
+# Simulate 100 Yule trees
+yuletrees <- pbtree(n=61,scale=3.715,nsim=100)
+# ltt null expectations with 95% CI
+ltt95(yuletrees,gamma=FALSE,log="TRUE")
+# Overlap the observed results in blue
+lines(rep(res$times,each=2)[-1],rep(res$ltt,each=2)[-124],col="blue",lwd=2)
+```
+
+On this graphic, median estimates for the Yule expectations is representeby a bold line, and 95% credible intervals by dashed lines. The ltt plot for the observed data is in blue.
+
+You can see that the observed accululation of lineages is clearly outside the 95% credible interval expected under a Yule model. 
+
+## $n$-rates Yule models
+
+The `laser` package also allow to fit Yule models in which there are $n$ speciation rates through time (up to 5 in the current `laser` package; see help `?yule2rate`). These functions will find the best breakpoints where the rates are expected to have switched and will estimate the speciation rates for the different intervals.
+
+With the present example, given that we observed a 'two step' speciation rates with the ltt plot, we will try to fit a 2-rates Yule model.
+
+
+```{r "Yule2rates"}
+# Fit a 2-rates Yule model
+diver.2r <- yule2rate(scaleBranchingtimes(getBtimes(string=write.tree(paramotree))))
+# Store the results
+results <- data.frame(model=c("Yule","birth-death","yule2rates"),
+              diver.r1=c(round(diver.pb$r1[[1]],3),round(diver.bd$r1,3),round(diver.2r['r2'],3)),
+              diver.r2=c(NA,NA,round(diver.2r['r1'],3)),
+              shift=c(NA,NA,round(diver.2r['st1'],3)),
+              mu=c(0,diver.bd$a,0),
+              lnL=c(diver.pb$LH[[1]],diver.bd$LH,diver.2r['LH']),
+              aic=c(diver.pb$aic[[1]],diver.bd$aic,diver.2r['AIC']))
+# Reorder the lines according to the AIC of the models
+results <- results[order(results$aic),]
+results
+```
+
+Note that shift times, like branching times, are given in divergence units before present. Therefore, the 2-rates yule model inferred a shift in diversification rate `r round(diver.2r['st1'],3)` myr before present. The diversification rate before the shift was `r round(diver.2r['r2'],3)` and after `r round(diver.2r['r1'],3)`, approximately 4.5 times higher. As you can see, this 2-rates model has the best fit of the three models tested (smallest AIC). Consequently, it more likely that there has been a rate shift between two pure-birth 'periods' during the evolution of the group rather than a single birth-death regime (with a large extinction rate). This looks much more realistic than having a much larger extinction rate than speciation rate as suggested with the birth-death model.
+
+## Disparity through time (dtt) plots
+
+It is also possible the look at the diversification of one or more characters. This can be done using disparity through time (dtt) plots. The disparity is a measure of the average distance between trait values for a given group of species. In macroevolutionary studies, it is most common to use the average of the squared Euclidean distances between tips. Note that this also allow to calculate disparity for multiple traits at once.
+
+The idea with the disparity through time function is to compare, at all time along the phylogeny, the observed disparity within clades with that between clades. This variance-based value varies between 0 and 1. Values near 0 at a specific time along the phylogeny imply that there is little disparity within clades and consequently that most ecological variation is partitioned between clades. At the opposite, values near 1 imply that most of the disparity is observed within clades. The `dtt` function compares the observed pattern with that obtained from simulations (by default using a Brownian motion model, although this can be modified manually; Joly et al. 2014).
+
+Let's calculate a disparity through time plot for the mean species altitude for the ferm complex.
+
+```{r "dtt"}
+# Replace NAs by the mean for the calculations
+paramodata[is.na(paramodata[,"Altitude"]),"Altitude"] <- mean(paramodata[,"Altitude"],na.rm=TRUE)
+# dtt plot
+res_dtt <- dtt(paramotree,paramodata['Altitude'], index="avg.sq", nsim=100,
+    calculateMDIp=T)
+```
+
+The plot show significantly high levels of disparity within clades around 0.5 and 0.85 (relative time) and in very recent groups. This means that during these time intervals, there is more diversity within clades than between clades, suggesting lots of diversification for this trait within these clades.
+
+# Trait dependent diversification rates
+
+In the previous section, we saw how to estimate diversification rates for a whole tree. However, it is often of interest to estimate the diversification rate of species that have a special morphological characteristic or that are in a given environment. This is exactly what the BISSE method does (Maddison et al. 2007). This method estimate diversification rates for states of a binary character. In other words, it will estimate the speciation rates and the extinction rates for the two states of a binary character. It also has the possibility of estimating the transition rates between the two states, a bit like the mkn model that we saw in a previous lecture.
+
+The BISSE model can have a up to 6 parameters:
+
+* $\lambda_1$, $\lambda_2$, the speciation rates parameters for states 1 and 2
+* $\mu_1$, $\mu_2$, the extinction rates parameters for states 1 and 2
+* $q_{1\rightarrow 2}$, $q_{2\rightarrow 1}$, the transition rates from state 1 to 2 and from state 2 to 1, respectively
+
+Note, however, that as with any model, it is possible to use simplified models, such as a model with equal transition rates between the two states ($q_{1\rightarrow 2} = q_{2\rightarrow 1}$) or with equal extinction rates ($\mu_1 = \mu_2$).
+
+It is also possible to test specifically some hypotheses by using constrained models. For instance, you can test if the speciation rates are significantly different for the two states by running two models. An unconstrained one, and another one for which the two speciation rates are constrained to be equal ($\lambda_1 = \lambda_2$). The two model could be compared as usual, for instance using the AIC.
+
+The BISSE approach is implemented in the `R` package `diversitree`. We will apply it on the Paramo example to compare two models. The first model will be unconstrained and will evaluate the speciation and extinction rates for species that are either exposed or sheltered. This specific model was not tested in the original paper. They instead focused on diversification rates in species growing or not in the Paramo ecosystem. This model will be compared with a constrained model in which the speciation rates and the extinction rates will be equal for the two states ($\lambda_1 = \lambda_2$, $\mu_1 = \mu_2$). This will allow to test whether exposed species have different speciation or extinction rates than sheltered species.
+
+```{r "BISSE", message=FALSE}
+require(diversitree)
+# Convert the character into a numeric binary vector
+char1 <- as.numeric(paramodata$ObservedMicrohabitat)
+names(char1) <- row.names(paramodata)
+# Create a BISSE likekihood model
+lik <- make.bisse(paramotree, char1)
+# Create starting points for the search
+p <- starting.point.bisse(paramotree)
+# Perform a ML search
+fit <- find.mle(lik, p, method="subplex")
+# lnL of the model
+logLik(fit)
+# The fitted parameters
+round(coef(fit), 2)
+
+# Test a constrained model where the speciation rates and extinction rates 
+# are set equal
+lik.l <- constrain(lik, lambda1 ~ lambda0, mu1 ~ mu0)
+fit.l <- find.mle(lik.l, p[-c(1,3)], method="subplex")
+logLik(fit.l)
+# Fitted parameters
+round(coef(fit.l), 2)
+
+# Test for statistical difference between the two models
+anova(fit, equal.lambda=fit.l)
+```
+
+You can see that the more complex model is significantly better than the constrained model. This suggest that the diversification rates are different for the two groups of species.
+
+## Bayesian BISSE analysis
+
+It is also possible to perform the same analysis in a Bayesian framework.
+
+The MCMC search needs tunning parameters, but these are hard to select *a priori*. The approach proposed by `diversitree` is to start by running a basic MCMC search to then estimate the tunning parameters from the range of observed values observed in this first search. Here is how it works.
+
+```{r "Bisse_MCMC"}
+# Generate priors. Since there are relatively few species, this is
+# important. We will use an exponential prior with rate 1/(2r),
+# where r is the character independent diversificiation rate:
+prior <- make.prior.exponential(0.1)
+
+# Perform a first rapid search (with tunning set arbitrarily to 10) 
+# that will be used to estimate the tuning parameters. We will run 
+# it for 100 steps only, but this might have to be adjusted for more
+# complex datasets.
+tmp <- mcmc(lik, p, nsteps=100, prior=prior, w=10, print.every=10)
+
+# Then estimate the tunning parameters for the real analysis. For this
+# we will remove the first ten generations.
+w <- diff(sapply(tmp[-(1:10),2:7], range))
+
+# Then run the true analysis. We will use 1000 steps here. Again, you
+# may need to run the MCMC chain longer for large analyses.
+samples <- mcmc(lik, fit$par, nsteps=1000, prior=prior, w=w,
+                print.every=50)
+```
+
+Now that we have the MCMC results, we will inspect the convergence of the MCMC chain using the `coda` package and we will plot the results.
+
+```{r "MCMC_results", message=FALSE, fig.heigth=9,fig.width=6, warning=FALSE}
+require(lattice)
+require(coda)
+# Read the BayesTrait results in coda format
+chain1 <- mcmc(samples,start=min(samples$i),end=max(samples$i),thin=1)
+# Trace plots of the parameters
+op <- par(mar=c(3,2.5,3,1),mgp=c(1.5,0.5,0),tcl=-0.25)
+plot(chain1[,c(2:5)])
+plot(chain1[,c(6:8)])
+# Look the effective sizes of the parameters after removing 
+# autocorrelation effects
+effectiveSize(chain1[,c(2:7)])
+```
+
+You can see that the chain is stable and the effective sample sizes (ESS) are correct (the chain should probably have run a bit longer). Ideally, you should run the analysis at least twice to confirm convergence.
+
+Now, let's look at the profile plots of the parameters.
+
+```{r "profile plots"}
+# Profile plots of the results
+col <- c("blue", "red")
+profiles.plot(samples[-(1:100),c("lambda0", "lambda1")], col.line=col, las=1,
+              xlab="Speciation rate", legend="topright",
+              main="Speciation rates")
+profiles.plot(samples[-(1:100),c("mu0", "mu1")], col.line=col, las=1,
+              xlab="Extinction rate", legend="topright")
+```
+
+These results suggest that the two groups are evolving under different models, although the distribution overlap considerably for both speciation and extinction. It other words, the difference in speciation and extinction rates between the two states is not significant. Yet, it can also be interesting to look at the diversification rates, which is the speciation rate minus the extinction rate.
+
+```{r "diversification rates"}
+#diversification rates
+diver<-data.frame(div0=samples$lambda0-samples$mu0,
+                  div1=samples$lambda1-samples$mu1)
+col <- c("blue", "red")
+profiles.plot(diver[-(1:100),c("div0","div1")], col.line=col, las=1,
+              xlab="Diversification rate", legend="topright",
+              main="Extinction rates")
+```
+
+With this, you can clearly see that the two group do not seem to have significant differences in net diversifiaction rate.
+
+Finally, it is possible to also run constrained models with the Bayesian approach. This could be useful for model testing using Bayes Factors for example. The code below would run the constrained model used above with ML, but here with a MCMC chain. Note that this analysis is not run here.
+
+```{r "MCMC_constrained", eval=FALSE}
+tmp.l <- mcmc(lik.l, p[-c(1,3)], nsteps=100, prior=prior, w=.1, print.every=1)
+```
+
+## Other BISSE-like models
+
+BISSE is restricted to only binary models, but there has been extentions of the BISSE model to other type of characters, such as multistate characters (MUSSE) or quantitative characters (QUASSE; Fitzjohn, 2010).
+
+## The problem of pseudoreplication
+
+Before finishing, I think it is important to say a word about the problem of pseudoreplication. Recently, different studies have highlighted that model testing using BISSE types of analyses can result in rejecting the null model more often than it should in certain situations (Maddison and Fitzjohn, 2015; Rabosky and Goldberg, 2015). In other words, you will reject the null hypothesis of no difference in diversification rates even if you should not.
+
+Maddison and Fitzjohn (2015) show that this is partly due to the problem of pseudoreplication. For instance, when the states have not evolved repeatidly during the evolution of a group, then there is a chance that the conclusion will be biased. In other words, the "clades" compared might have different diversification rates, but absence of replication mean that you cannot assign these differences to the trait studied.
+
+Rabosky and Goldberg (2015) further showed that the $\alpha$ levels for statistical testing are biased. In other words, if you use a $p$-value of 5% for testing, you will reject the null hypothesis much more frequently than 5% of the time. However, this problem could be corrected using simulation to fix appropriate $p$-values.
+
+If you are interesting in using these types of models, you should clearly read these two studies to be aware of the potential pitfalls with these models.
+
+
+# References
+
+Maddison W.P., FitzJohn R.G. 2015. The unsolved challenge to phylogenetic correlation tests for categorical characters. *Systematic Biology*. 64:127–136.
+
+FitzJohn R.G. 2010. Quantitative Traits and Diversification. *Systematic Biology*. 59:619 –633.
+
+Joly S., P.B. Heenan, P.J. Lockhart. 2014. Species radiation by niche shifts in New Zealand’s rockcresses (Pachycladon, Brassicaceae). *Systematic Biology*. 63:192–202.
+
+Maddison W.P., Midford P.E., Otto S.P. 2007. Estimating a binary character’s effect on speciation and extinction. *Systematic Biology*. 56:701 –710.
+
+Rabosky D.L., Goldberg E.E. 2015. Model Inadequacy and Mistaken Inferences of Trait-Dependent Speciation. *Systematic Biology*. 64:340–355.
+
+Sánchez-Baracaldo P., Thomas G.H. 2014. Adaptation and Convergent Evolution within the Jamesonia-Eriosorus Complex in High-Elevation Biodiverse Andean Hotspots. *PLoS ONE*. 9:e110618.

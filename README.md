@@ -88,9 +88,15 @@ Phylogenetic signal (Moran's I, Abouheif's c, Pagel's lambda, Blomberg's K, Mora
 
 ----
 
-## Lecture 6 - Diversification analyses
+## Lecture 7 - Diversification analyses
 
-Lineage through-time plots; diversification rate estimation; Trait dependent speciaton and extinction (BISSE model)
+Lineage through-time (ltt) plots; diversification rate estimation; Yule and Birth-and-death models; Diversification through time (dtt) plots; Trait dependent speciaton and extinction (BISSE model).
+
+[Lecture material](./lecture7/)
+
+### Tutorial
+
+[Diversification](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture7/Diversification.html)
 
 ----
 
