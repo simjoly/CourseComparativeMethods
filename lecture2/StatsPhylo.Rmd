@@ -1,7 +1,7 @@
 ---
-title: "Phylogenetic Methods"
+title: "Phylogenetic comparative methods"
 author: "Simon Joly"
-date: "BIO 6008 - Fall 2015"
+date: "Fall 2015"
 output:
   html_document:
     highlight: haddock
@@ -59,7 +59,7 @@ This would suggest that the assotiation is significant. However, we know that th
 
 # The Brownian Motion (BM) model
 
-When we want to account for the non-independence of species due to their evolutionary histories in statistical analyses, a model of evolution is necessarily implied. Indeed, we assume that traits evolved in time (along the phylogeny) and that closely related species will be more likely to be more similar on average at a given trait than distantly related species. In evolutionary biologogy, the more basic model (often used as a null model in many analyses) is the Brownian motion model. This model of evolution is named after Robert Brown, a celeb botanist that published an important Flora of Australia in 1810. He was also the first to distinguish gymnosperms from angiosperms. His discovery of the Brownian motion is due to the observation that small particules in solution have the tendency to move in any direction, an observation first made while observing *Clarkia* pollen under a microscope. The explanation would come later, in terms of random molecular impacts.
+When we want to account for the non-independence of species due to their evolutionary histories in statistical analyses, a model of evolution is necessarily implied. Indeed, we assume that traits evolved through time (along the phylogeny) and that closely related species are more likely to be more similar on average at a given trait than distantly related species. In evolutionary biologogy, the more basic model (often used as a null model in many analyses) is the Brownian motion model. This model of evolution is named after Robert Brown, a celeb botanist that published an important Flora of Australia in 1810. He was also the first to distinguish gymnosperms from angiosperms. His discovery of the Brownian motion is due to the observation that small particules in solution have the tendency to move in any direction, an observation first made while observing *Clarkia* pollen under a microscope. The explanation would come later, in terms of random molecular impacts.
 
 Mathematicians have constructed a stochastic process that is intended to approximate the Brownian motion. In this model, each step is independent from the others and can go in any direction. The mean displacement is zero and the variance is uniform across the parameter space. The displacements can be summed, which means that the variances of the independent displacements can be added up. If $\sigma^2$ is the variance of a single displacement, the variance after time $t$ will be $\sigma^2t$. When the number of steps is large, as in a phylogenetic context, the result is normally distributed.
 
@@ -88,7 +88,7 @@ rm(data,x,y)
 
 A more thorough introduction to the Brownian Motion model can be found in Felsenstein (2004, chapter 23).
 
-Note also that the model is stochastic. That is, even if two closely related species are more likely to share similar character states than a distant one, this is only true on average. For any given simulated character, closely related species can somtimes be more different than to a distant species. Look at the following example.
+Note also that the model is stochastic. That is, even if two closely related species are more likely to share similar character states than a distant one, this is only true on average. For any given simulated character, closely related species can somtimes be more different than to a distant species. Look at the following figure, that shows three traits simulated under the Brownian motion.
 
 ```{r "PlotContinuousParameter_tablephylo4d", echo=FALSE, message=FALSE, fig.align='center'}
 library(phytools)
@@ -142,7 +142,7 @@ seedplantsdata <- seedplantsdata[seedplantstree$tip.label,]
 
 ## Calculate contrasts
 
-We will now calculate independent contrasts using the `pic` function in `ape`. First, let's create numeric vectors for four traits: wood density (Wd), shade tolerance (Shade), seed mass (Sm), and nitrogen content (N). A contrast will be calculated for each node. So if there are $n$ species in your tree, $n-1$ contrasts will be estimated. Note that contrasts are estimated for each character individually.
+We will now calculate independent contrasts using the `pic` function in `ape`. First, let's create numeric vectors for four traits: wood density (Wd), shade tolerance (Shade), seed mass (Sm), and nitrogen content (N).
 
 ```{r "Calculating_Contrasts", warning=FALSE}
 # Extract trait data into vectors
@@ -152,6 +152,11 @@ Sm <- seedplantsdata$Sm
 N <- seedplantsdata$N
 # Important: Give names to your vectors
 names(Wd) <- names(Shade) <- names(Sm) <- names(N) <- row.names(seedplantsdata)
+```
+
+Now, contrats will be calculated for each trait. For each trait, a contrast will be calculated for each node. So if there are $n$ species in your tree, $n-1$ contrasts will be estimated. Note that contrasts are estimated for each character individually.
+
+```{r "Calculating_Contrasts_2", warning=FALSE}
 # Calculate the contrasts for each trait that have been scaled using the expected
 # variances
 Wd.contrast <- pic(Wd,seedplantstree,scaled=TRUE)
@@ -176,9 +181,13 @@ nodelabels(round(Sm.contrast, 2), adj = c(-0.1, 1), frame="n",cex=0.5)
 nodelabels(round(N.contrast, 2), adj = c(-0.1, 2.5), frame="n",cex=0.5)
 ```
 
+If you have more of less traits in your own data, you will have to play with the `adj = c(-0.1, -2)` option to get a nice graphical representation.
+
 ## Testing for statistical association between traits
 
 The correlation between two traits will be tested. Specifically, we will test two hypotheses. The first one is that wood density affects shade tolerance, and the second that leaf nitrogen content affects seed mass.
+
+Let's first look at a standard regression, that is not controlling for the phylogeny.
 
 ```{r "Standard_regression", warning=FALSE}
 RegressShade <- lm(Shade ~ Wd, seedplantsdata)
@@ -187,7 +196,7 @@ RegressSm <- lm(Sm ~ N, seedplantsdata)
 summary.lm(RegressSm)
 ```
 
-You can see that there is not significant effect of wood density on shade tolerance, but that the relation between nitrogen content and seed mass is significant. Now let's look at the same relationships after we corrected for phylogenetic information.
+You can see that there is no significant effect of wood density on shade tolerance, but that the relation between nitrogen content and seed mass is significant. Now let's look at the same relationships after we corrected for phylogenetic relatedness of species.
 
 ```{r "PIC_regression", warning=FALSE}
 RegressShade.pic <- lm(Shade.contrast~Wd.contrast -1)
@@ -198,11 +207,11 @@ summary.lm(RegressSm.pic)
 
 > The -1 in the model specifies that the regression is through the origin (the intercept is set to zero) as recommended by Garland et al., 1992.
 
-When taking phylogenetic information into account, seed mass is not significantly related to nitrogen contant anymore. This means that the apparent correlation observed on the raw data was an artefact of their evolutionary histories. The other regression, in contrast, now shows a significant relationship between wood density and shade tolerance. This is a positive example of the application of PIC. Indeed, the application of PIC does not always make the relationships less significant. Sometimes, it helps highlight significant relationships that were obscured by the evolutionary history of species.
+When taking phylogenetic information into account, seed mass is not significantly related to nitrogen content anymore. This means that the apparent correlation observed on the raw data was an artefact of their evolutionary histories. The other regression, in contrast, now shows a significant relationship between wood density and shade tolerance. This is a positive example of the application of PIC. Indeed, the application of PIC does not always make the relationships less significant. Sometimes, it helps highlight significant relationships that were obscured by the evolutionary history of species.
 
 ## Plot contrasts
 
-It is often useful to plot the contrasts to visualize the regression. This allows to check that there indeed a linear relationship between the 2 variables:
+It is often useful to plot the contrasts to visualize the regression. This allows to check that there is indeed a linear relationship between the 2 variables:
 
 ```{r "Plot_PIC_regression", fig.height=3, fig.width=3, fig.align='center'}
 library(ggplot2)
@@ -231,7 +240,7 @@ In these cases, the results are the same as for the standard regression.
 
 # Phylogenetic generalized least squares (PGLS)
 
-Phylogenetic generalized least squares are very similar to PIC. The idea is the same, that is to remove the effect of the evolutionary relationships of species when fitting a regression between two variable. Generalized least squares allows to user to specify a covariance structure that characterize the data and which effect should be removed when fitting the regression. The trick with PGLS is to give a covariance matrix that represents the evolutionary relationships between species. Depending on the model of evolution of the characters, the covariance matrix can be scaled using different approaches. For instance, one might assume that the character evolve under the Brownian motion model, or under an Ornstein-Uhlenbeck model, where the co-variance between two species decreases exponentially according to a parameter alpha. There are several correlation structures available in `ape`. We will see some of these models in detail later in the course.
+Phylogenetic generalized least squares are very similar to PIC. The idea is the same, that is to remove the effect of the evolutionary relationships of species when fitting a regression between two variables. Generalized least squares allows to user to specify a covariance structure that characterize the data and which effect should be removed when fitting the regression. The trick with PGLS is to give a covariance matrix that represents the evolutionary relationships between species. Depending on the model of evolution of the characters, the covariance matrix can be scaled using different approaches. For instance, one might assume that the character evolves under the Brownian motion model, or under an Ornstein-Uhlenbeck model where the co-variance between two species decreases exponentially according to a parameter alpha. There are several correlation structures available in `ape`. We will see some of these models in detail later in the course, for instance in lecture 5.
 
 In the present case, we will use the Brownian Motion structure, which is also the model behind PIC.
 
@@ -287,7 +296,8 @@ test.anova <- gls(Y ~ X - 1, data=testdata, correlation = tree.corr)
 summary(test.anova)
 # The residuals should be normally distributed
 qplot(residuals(test.anova),geom="histogram",binwidth=1)
-#hist(residuals(test.anova))
+# Other plotting alternative:
+# hist(residuals(test.anova))
 # It is possible to test if the ANOVA model is better than a null model
 anova(test.anova)
 # It is also possible to compare directly two different models. Here is a simple model
@@ -406,9 +416,6 @@ legend("bottomright",pch=20,legend=levels(category),col=colPalette[category],pt.
 
 The plots are relatively similar, which means that the phylogeny might not be very important in shaping the traits amongst the species. Yet, there are also some differences. For instance, gymnosperms and angiosperms group mostly together in the standard PCA. In contrast, when the evolutionary history of species are taken into account, we see the affinities of species that are not due to shared ancestry. For instance, *Abies* is farther from *Larix* (another gymnosperm) in the pPCA, and is closer to *Tilia* and *Fagus*, at the opposite side of the plot.
 
-# Practical assignment
-
-Please test a linear model of your choice using Phylogenetic General Least Squares (PGLS) on your data.
 
 # References
 

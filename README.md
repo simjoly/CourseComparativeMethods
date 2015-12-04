@@ -1,6 +1,6 @@
 # Course on Comparative Methods
 
-This repository contains examples of application of phylogenetic comparative methods in the statistical software R.
+This repository contains tutorials structured in 7 different lectures that gives examples of application of phylogenetic comparative methods in the statistical software R.
 
 ### Acknowledgements
 
@@ -24,7 +24,7 @@ There are several ways you could use the material. You could for example downloa
 
 ----
 
-## Lecture 2 - Regressions and correlations
+## Lecture 2 - Phylogenetic Comparative Methods
 
 The Brownian Motion (BM) model, Phylogenetic Independent Contrasts (PIC), Phylogenetic General Least Squares (PGLS), Phylogenetic Principal Component Analysis (pPCA).
 
@@ -32,7 +32,7 @@ The Brownian Motion (BM) model, Phylogenetic Independent Contrasts (PIC), Phylog
 
 ### Tutorials
 
-[Regressions and correlations](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/StatsPhylo.html)
+[Phylogenetic Comparative Methods](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/StatsPhylo.html)
 
 [Reading and making phylogenetic trees in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/PhylogeneticTree.html)
 
