@@ -11,9 +11,10 @@ The links below might provide additional information of interest.
 
 [Course on Phylogenetic Comparative Methods](http://github.com/simjoly/CourseComparativeMethods/)
 
-[Introduction to phylogenies in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/course1/Introduction_phylo.html) - [pdf](http://github.com/simjoly/CourseComparativeMethods/blob/master/course1/Introduction_phylo.pdf)
+[Introduction to phylogenies in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture1/Introduction_phylo.html) - [pdf](http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture1/Introduction_phylo.pdf)
 
 [Reading and making phylogenetic trees in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/PhylogeneticTree.html) - [pdf](http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/PhylogeneticTree.pdf)
+
 
 ----
 
