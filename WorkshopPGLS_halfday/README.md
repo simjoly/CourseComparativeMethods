@@ -1,6 +1,6 @@
 # Half-day workshop on Phylogenetic Generalized Least Squares (PGLS)
 
-This folder contains material for a half-day workshop introducing Phylogenetic Generalized Least Squares (PGLS). It is available either as a [web page](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.html) (html document) or a [pdf document](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.pdf). The source code in R Markdown (.Rmd) is also available.
+This folder contains material for a half-day workshop introducing Phylogenetic Generalized Least Squares (PGLS). It is available either as a [web page](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.html) (html document) or a [pdf document](http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.pdf). The source code in R Markdown (.Rmd) is also available.
 
 [Half-day PGLS workshop](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.html)
 
