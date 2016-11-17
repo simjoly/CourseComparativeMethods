@@ -1,11 +1,13 @@
 # Half-day workshop on Phylogenetic Generalized Least Squares (PGLS)
 
-This folder contains material for a half-day workshop introducing Phylogenetic Generalized Least Squares (PGLS). It is available either as a [web page](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.html) (html document) or a [pdf document](http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.pdf). The source code in R Markdown (.Rmd) is also available.
+This folder contains material for a half-day workshop introducing Phylogenetic Generalized Least Squares (PGLS) and learn how to implement it in the R language. It contains a pdf [presentation](http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/PGLS_presentation.pdf), as well as a tutorial that is available either as a [web page](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.html) (html document) or as a [pdf document](http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.pdf). The source code in R Markdown (.Rmd) is also available.
 
-[Half-day PGLS workshop](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.html)
+[Introduction to PGLS](http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/PGLS_presentation.pdf) | pdf presentation
+
+[PGLS tutorial](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.html) | Tutorial on PGLS with examples in R
 
 
-## Other information
+## Other useful information
 
 The links below might provide additional information of interest.
 
