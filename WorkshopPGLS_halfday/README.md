@@ -6,6 +6,8 @@ This folder contains material for a half-day workshop introducing Phylogenetic G
 
 [PGLS tutorial](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/StatsPhylo.html) | Tutorial on PGLS with examples in R
 
+[Data](http://github.com/simjoly/CourseComparativeMethods/blob/master/WorkshopPGLS_halfday/data) | Files you will need to perform the examples in the tutorial
+
 
 ## Other useful information
 
