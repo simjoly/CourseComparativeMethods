@@ -3,13 +3,13 @@ title: "Phylogenetic generalized least squares (PGLS)"
 author: "Simon Joly"
 date: "Fall 2016"
 output:
+  pdf_document:
+    highlight: haddock
+    toc: yes
+    toc_depth: 2
   html_document:
     highlight: haddock
     theme: united
-    toc: yes
-    toc_depth: 2
-  pdf_document:
-    highlight: haddock
     toc: yes
     toc_depth: 2
 ---
@@ -25,11 +25,6 @@ To perform the examples of this document, you will need to load the following R 
 ```{r "load libraries", message=FALSE, warning=FALSE}
 library(nlme)
 library(ape)
-library(phytools)
-library(geiger)
-library(adephylo)
-library(phylobase)
-library(ggplot2)
 library(RColorBrewer)
 ```
 
@@ -214,7 +209,7 @@ varcovar
 This is great, but we mentioned above that it is a correlation matric that we need in a GLS to account for the correlation in the residuals. To obtain a correlation matrix from the variance-covariance matrix shown above, you only need to divide the variance-covariance matrix by the length of the tree, or the distance from the root to the tips. It can also be obtained using the R function `cov2cor`.
 
 ```{r "cov2cor"}
-corrmat <- cov2cor(VCV)
+corrmat <- cov2cor(varcovar)
 round(corrmat,3)
 ```
 
@@ -431,7 +426,7 @@ summary(wd.final)
 ```
 
 
-# When should be use PGLS?
+# When should we use PGLS?
 
 A very common mistake made when someone considers to use PGLS is to test for phylogenetic signal in $Y$ or $X$ using either Pagel's $\lambda$ or Blomberg's $K$, and if they observe some phylogenetic signal, they use a PGLS to analyse their data. This is a ***big mistake***. As we saw earlier, PGLS corrects for phylogenetic correlation in the residuals and not in the variables. Therefore, the presence of phylogenetic signal in the variables does not necessarily mean that the residuals are phylogenetically correlated.
 
