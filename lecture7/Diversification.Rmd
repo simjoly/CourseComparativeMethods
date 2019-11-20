@@ -3,13 +3,13 @@ title: "Diversification"
 author: "Simon Joly"
 date: "Fall 2019"
 output:
-  pdf_document:
-    highlight: default
-    toc: yes
-    toc_depth: 2
   html_document:
     highlight: haddock
     theme: united
+    toc: yes
+    toc_depth: 2
+  pdf_document:
+    highlight: default
     toc: yes
     toc_depth: 2
 ---
@@ -322,7 +322,7 @@ plot(res,type="l",show.tree=TRUE,log.lineages=TRUE,main="LTT plot")
 
 You can see that there are long branches at the base of the tree. Then there is a rapid increase and a slowdown as it reaches the present. Let's compare it to a Yule tree.
 
-```{r "ltt_null_paramo", warning=FALSE, message=FALSE}
+```{r "ltt_null_paramo", warning=FALSE, message=FALSE, eval=F, echo=F}
 # Pure-birth prediction:
 h<-max(nodeHeights(paramotree))
 b<-(log(Ntip(paramotree))-log(2))/h
