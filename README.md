@@ -18,9 +18,9 @@ There are several ways you could use the material. You could for example downloa
 
 ### Tutorials
 
-[RMardown example](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture1/First_RMarkdown_Document.html)
+[RMardown example](http://htmlpreview.github.io/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture1/First_RMarkdown_Document.html)
 
-[Introduction to phylogenies in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture1/Introduction_phylo.html)
+[Introduction to phylogenies in R](http://htmlpreview.github.io/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture1/Introduction_phylo.html)
 
 ----
 
@@ -32,9 +32,9 @@ The Brownian Motion (BM) model, Phylogenetic Independent Contrasts (PIC), Phylog
 
 ### Tutorials
 
-[Phylogenetic Comparative Methods](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/StatsPhylo.html)
+[Phylogenetic Comparative Methods](http://htmlpreview.github.io/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/StatsPhylo.html)
 
-[Reading and making phylogenetic trees in R](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/PhylogeneticTree.html)
+[Reading and making phylogenetic trees in R](http://htmlpreview.github.io/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture2/PhylogeneticTree.html)
 
 ----
 
@@ -46,7 +46,7 @@ Reconstruction of ancestral states on phylogenies for quantitative and qualitati
 
 ### Tutorial
 
-[Ancestral states reconstruction](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture3/AncestralStatesReconstruction.html)
+[Ancestral states reconstruction](http://htmlpreview.github.io/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture3/AncestralStatesReconstruction.html)
 
 ----
 
@@ -60,7 +60,7 @@ Bayesian reconstruction of ancestral states using BayesTraits, Testing the corre
 
 ### Tutorial
 
-[BayesTraits](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture4/BayesTraits.html)
+[BayesTraits](http://htmlpreview.github.io/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture4/BayesTraits.html)
 
 ----
 
@@ -72,7 +72,7 @@ Ornstein-Uhlenbeck (OU) model, Early-Burst model, Speciational model, Simulating
 
 ### Tutorial
 
-[OUModels](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture5/OUModels.html)
+[OUModels](http://htmlpreview.github.io/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture5/OUModels.html)
 
 ----
 
@@ -84,7 +84,7 @@ Phylogenetic signal (Moran's I, Abouheif's c, Pagel's lambda, Blomberg's K, Mora
 
 ### Tutorial
 
-[Phylogenetic signal and PD](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture6/PD.html)
+[Phylogenetic signal and PD](http://htmlpreview.github.io/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture6/PD.html)
 
 ----
 
@@ -97,7 +97,7 @@ Diversification rate estimation; Birth-death and Yule models; Lineage through-ti
 
 ### Tutorial
 
-[Diversification](http://htmlpreview.github.com/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture7/Diversification.html)
+[Diversification](http://htmlpreview.github.io/?http://github.com/simjoly/CourseComparativeMethods/blob/master/lecture7/Diversification.html)
 
 ----
 
